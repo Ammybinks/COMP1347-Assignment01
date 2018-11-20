@@ -100,6 +100,7 @@ namespace FishORama
                                     // Creation and initialization is performed in the LoadContent method.
 
 
+
         #endregion
 
         #region Properties
@@ -222,11 +223,11 @@ namespace FishORama
             /*
              * Create Tokens
              */
-            Console.WriteLine("Welcome to the FishORama Framework");
-
             AquariumToken aquarium = new AquariumToken("Aquarium", this, 800, 600);         // Create aquarium token.
+
+            OrangeFishToken supaOrangeFish = new OrangeFishToken("SupaOrangeFish", aquarium); // Create SupaOrangeFish token
                         
-             /* LEARNING PILL: placing tokens in a scene.
+            /* LEARNING PILL: placing tokens in a scene.
              * In order to be managed by the Machinationis Ratio engine, tokens must be placed
              * in a scene.
              * 
@@ -246,6 +247,9 @@ namespace FishORama
 
             tokenPos = new Vector3(0, 0, 0);            // Define scene position for the aquarium.
             mScene.Place(aquarium, tokenPos);           // Place token in scene.
+
+            tokenPos = new Vector3(0, 0, 1); // Define position for SupaOrangeFish
+            mScene.Place(supaOrangeFish, tokenPos); // Place token in scene
 
             /*
              * Create and Initialize camera

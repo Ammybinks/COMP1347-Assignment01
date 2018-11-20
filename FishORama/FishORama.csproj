@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="AquariumMind.cs" />
     <Compile Include="AquariumToken.cs" />
+    <Compile Include="BaseFishMind.cs" />
+    <Compile Include="BaseFishToken.cs" />
     <Compile Include="ChickenLegToken.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="OrangeFishMind.cs" />
