@@ -98,70 +98,41 @@ namespace FishORama
         }
 
         /// <summary>
-        /// Clamps fish to horizontal edge of screen
-        /// </summary>
-        /// <param name="amount">The distance the fish is beyond the respective edge</param>
-        /// <param name="direction">Which direction the fish should be moved</param>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 ClampToScreenX(float amount, int direction, Vector3 tokenPosition)
-        {
-            tokenPosition.X += amount * direction;
-
-            return tokenPosition;
-        }
-        /// <summary>
-        /// Clamps fish to horizontal edge of screen
-        /// </summary>
-        /// <param name="amount">The distance the fish is beyond the respective edge</param>
-        /// <param name="direction">Which direction the fish should be moved</param>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 ClampToScreenY(float amount, int direction, Vector3 tokenPosition)
-        {
-            tokenPosition.Y += amount * direction;
-
-            return tokenPosition;
-        }
-
-        /// <summary>
         /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
         /// </summary>
         /// <param name="tokenPosition">Current position of the fish</param>
         /// <returns>The fishes new position</returns>
         private Vector3 CheckPosition(Vector3 tokenPosition)
         {
-            if (Math.Abs(tokenPosition.X - mAquarium.Position.X) >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
+            Vector3 relativePosition = tokenPosition - mAquarium.Position;
+
+            if (Math.Abs(relativePosition.X) >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
             {
-                float extraPosition = Math.Abs(tokenPosition.X - mAquarium.Position.X) - mAquarium.Width / 2; // Store the distance the fish has swum past the boundary
-                int direction = 1;
-
-                if (tokenPosition.X < 0) // If the left edge of the screen was hit
+                if (relativePosition.X <= 0) // If the left edge of the screen was hit
                 {
-                    direction = 1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.X = (mAquarium.Width / 2) * -1; // Lock fish to left edge of screen
                 }
-                else if (tokenPosition.X > 0) // If the right edge of the screen was hit
+                else if (relativePosition.X > 0) // If the right edge of the screen was hit
                 {
-                    direction = -1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.X = (mAquarium.Width / 2); // Lock fish to right edge of screen
                 }
 
-                tokenPosition = ClampToScreenX(extraPosition, direction, tokenPosition);
+                mFacingDirectionX *= -1;
+
+                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                                                              this.PossessedToken.Orientation.Y,
+                                                              this.PossessedToken.Orientation.Z);
             }
-            if (Math.Abs(tokenPosition.Y - mAquarium.Position.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
+            if (Math.Abs(relativePosition.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
             {
-                float extraPosition = Math.Abs(tokenPosition.Y - mAquarium.Position.Y) - mAquarium.Height / 2; // Store the distance the fish has swum past the boundary
-                int direction = 1;
-
-                if (tokenPosition.Y < 0) // If the bottom edge of the screen was hit
+                if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
                 {
-                    direction = 1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.Y = (mAquarium.Height / 2) * -1; // Lock fish to bottom edge of screen
                 }
-                else if (tokenPosition.Y > 0) // If the top edge of the screen was hit
+                else if (relativePosition.Y > 0) // If the top edge of the screen was hit
                 {
-                    direction = -1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.Y = (mAquarium.Height / 2); // Lock fish to top of screen
                 }
-
-                tokenPosition = ClampToScreenY(extraPosition, direction, tokenPosition);
             }
 
             return tokenPosition;

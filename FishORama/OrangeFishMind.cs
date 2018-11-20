@@ -55,13 +55,15 @@ namespace FishORama
         // an instance variable a reference to its aquarium.
         private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
 
+        private Vector3 tokenPosition; // Stores the temporary position of the fish
+
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
         private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
-        private float mSpeedX = 2; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 2; // Defines vertical movement speed of the fish
+        private float mSpeedX = 5; // Defines horizontal movement speed of the fish
+        private float mSpeedY = 0; // Defines vertical movement speed of the fish
 
-        private enum Action
+        private enum Action // Enumeration of actions that can be taken by the fish
         {
             None,
             Dashing,
@@ -71,6 +73,17 @@ namespace FishORama
         }
         private Action currentAction = Action.None; // Holds the current special action the fish is taking; holds 'None' while fish is using regular behaviour
 
+        private Random rand = new Random(); // Initialise global random number generator
+
+        private int startTime; // Stores the time the program started
+
+        // Initialise timers for each individual behaviour
+        private int dashingTimer = 0;
+        private int acceleratingTimer = 0;
+        private int hungryTimer = 0;
+        private int sinkingTimer = 0;
+
+        private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
         #endregion
 
         #region Properties
@@ -99,7 +112,14 @@ namespace FishORama
              * from class AIPlayer.
              */
             this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing.            
+            mFacingDirectionX = 1;       // Current direction the fish is facing.  
+
+            startTime = (DateTime.Now.Second + DateTime.Now.Minute * 60);
+
+            dashingTimer = rand.Next(10, 31);
+            acceleratingTimer = rand.Next(10, 31);
+            hungryTimer = rand.Next(10, 31);
+            sinkingTimer = rand.Next(10, 31);
         }
 
         #endregion
@@ -121,44 +141,57 @@ namespace FishORama
          * 
          */
 
+        private void SpecialBehaviour()
+        {
+            switch(currentAction)
+            {
+                case Action.Dashing:
+                    dashingTimer = 100;
+                    currentAction = Action.None;
+                    break;
+                case Action.Accelerating:
+                    acceleratingTimer = 100;
+                    currentAction = Action.None;
+                    break;
+                case Action.Hungry:
+                    hungryTimer = 100;
+                    currentAction = Action.None;
+                    break;
+                case Action.Sinking:
+                    sinkingTimer = 100;
+                    currentAction = Action.None;
+                    break;
+                case Action.None:
+                    if(dashingTimer <= 0)
+                    {
+                        currentAction = Action.Dashing;
+                    }
+                    else if(acceleratingTimer <= 0)
+                    {
+                        currentAction = Action.Accelerating;
+                    }
+                    else if(hungryTimer <= 0)
+                    {
+                        currentAction = Action.Hungry;
+                    }
+                    else if(sinkingTimer <= 0)
+                    {
+                        currentAction = Action.Sinking;
+                        distanceToSwim = rand.Next(50, 151);
+                    }
+                    break;
+            }
+        }
+
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
         /// </summary>
         /// <param name="tokenPosition">Current position of the fish</param>
         /// <returns>The fishes new position</returns>
-        private Vector3 Move(Vector3 tokenPosition)
+        private void Move()
         {
-            tokenPosition.X += mSpeedX;
-            tokenPosition.Y += mSpeedY;
-            
-            return tokenPosition;
-        }
-
-        /// <summary>
-        /// Clamps fish to horizontal edge of screen
-        /// </summary>
-        /// <param name="amount">The distance the fish is beyond the respective edge</param>
-        /// <param name="direction">Which direction the fish should be moved</param>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 ClampToScreenX(float amount, int direction, Vector3 tokenPosition)
-        {
-            tokenPosition.X += amount * direction;
-
-            return tokenPosition;
-        }
-        /// <summary>
-        /// Clamps fish to horizontal edge of screen
-        /// </summary>
-        /// <param name="amount">The distance the fish is beyond the respective edge</param>
-        /// <param name="direction">Which direction the fish should be moved</param>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 ClampToScreenY(float amount, int direction, Vector3 tokenPosition)
-        {
-            tokenPosition.Y += amount * direction;
-
-            return tokenPosition;
+            tokenPosition.X += mSpeedX * mFacingDirectionX;
+            tokenPosition.Y += mSpeedY * mFacingDirectionY;
         }
 
         /// <summary>
@@ -166,42 +199,46 @@ namespace FishORama
         /// </summary>
         /// <param name="tokenPosition">Current position of the fish</param>
         /// <returns>The fishes new position</returns>
-        private Vector3 CheckPosition(Vector3 tokenPosition)
+        private void CheckPosition()
         {
-            if (Math.Abs(tokenPosition.X - mAquarium.Position.X) >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
+            Vector3 relativePosition = tokenPosition - mAquarium.Position;
+
+            if (Math.Abs(relativePosition.X) >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
             {
-                float extraPosition = Math.Abs(tokenPosition.X - mAquarium.Position.X) - mAquarium.Width / 2; // Store the distance the fish has swum past the boundary
-                int direction = 1;
-
-                if (tokenPosition.X < 0) // If the left edge of the screen was hit
+                if (relativePosition.X <= 0) // If the left edge of the screen was hit
                 {
-                    direction = 1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.X = (mAquarium.Width / 2) * -1; // Lock fish to left edge of screen
                 }
-                else if (tokenPosition.X > 0) // If the right edge of the screen was hit
+                else if (relativePosition.X > 0) // If the right edge of the screen was hit
                 {
-                    direction = -1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.X = (mAquarium.Width / 2); // Lock fish to right edge of screen
                 }
 
-                tokenPosition = ClampToScreenX(extraPosition, direction, tokenPosition);
+                mFacingDirectionX *= -1;
+
+                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                                                              this.PossessedToken.Orientation.Y,
+                                                              this.PossessedToken.Orientation.Z);
             }
-            if (Math.Abs(tokenPosition.Y - mAquarium.Position.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
+            if (Math.Abs(relativePosition.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
             {
-                float extraPosition = Math.Abs(tokenPosition.Y - mAquarium.Position.Y) - mAquarium.Height / 2; // Store the distance the fish has swum past the boundary
-                int direction = 1;
-
-                if (tokenPosition.Y < 0) // If the bottom edge of the screen was hit
+                if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
                 {
-                    direction = 1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.Y = (mAquarium.Height / 2) * -1; // Lock fish to bottom edge of screen
                 }
-                else if (tokenPosition.Y > 0) // If the top edge of the screen was hit
+                else if (relativePosition.Y > 0) // If the top edge of the screen was hit
                 {
-                    direction = -1; // Set which direction to move the fish to keep it on the screen
+                    tokenPosition.Y = (mAquarium.Height / 2); // Lock fish to top of screen
                 }
-
-                tokenPosition = ClampToScreenY(extraPosition, direction, tokenPosition);
             }
+        }
 
-            return tokenPosition;
+        private void CheckTime()
+        {
+            dashingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
+            acceleratingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
+            hungryTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
+            sinkingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
         }
 
         /// <summary>
@@ -210,10 +247,13 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            Vector3 tokenPosition = PossessedToken.Position; // Store the current position of the fish
+            tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
-            tokenPosition = Move(tokenPosition);
-            tokenPosition = CheckPosition(tokenPosition);
+            SpecialBehaviour();
+            Move();
+            CheckPosition();
+
+            CheckTime();
 
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
 
