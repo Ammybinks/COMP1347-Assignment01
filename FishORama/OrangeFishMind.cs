@@ -60,8 +60,20 @@ namespace FishORama
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
         private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
-        private float mSpeedX = 5; // Defines horizontal movement speed of the fish
+        private float mSpeedX = 2; // Defines horizontal movement speed of the fish
         private float mSpeedY = 0; // Defines vertical movement speed of the fish
+
+        private float maxSpeedX = 12; // Defines the absolute maximum speed the fish will travel horizontally, after any behaviour modifiers
+        private float maxSpeedY = 12; // Defines the absolute maximum speed the fish will travel vertically, after any behaviour modifiers
+
+        private float minSpeedX = 2; // Defines the absolute minimum speed the fish will travel horizontally, after any behaviour modifiers
+        private float minSpeedY = 2; // Defines the absolute minimum speed the fish will travel vertically, after any behaviour modifiers
+
+        private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
+        private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
+
+        private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
+        private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
 
         private enum Action // Enumeration of actions that can be taken by the fish
         {
@@ -74,15 +86,16 @@ namespace FishORama
         private Action currentAction = Action.None; // Holds the current special action the fish is taking; holds 'None' while fish is using regular behaviour
 
         private Random rand = new Random(); // Initialise global random number generator
-
-        private int startTime; // Stores the time the program started
+        
+        private int currentTime; // Stores the current time, captured every update. Checked against startTime to determine total time since the last behaviour ended
 
         // Initialise timers for each individual behaviour
-        private int dashingTimer = 0;
-        private int acceleratingTimer = 0;
-        private int hungryTimer = 0;
-        private int sinkingTimer = 0;
+        private int dashingTimer;
+        private int acceleratingTimer;
+        private int hungryTimer;
+        private int sinkingTimer;
 
+        private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
         private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
         #endregion
 
@@ -114,12 +127,13 @@ namespace FishORama
             this.Possess(pToken);       // Possess token.
             mFacingDirectionX = 1;       // Current direction the fish is facing.  
 
-            startTime = (DateTime.Now.Second + DateTime.Now.Minute * 60);
-
-            dashingTimer = rand.Next(10, 31);
-            acceleratingTimer = rand.Next(10, 31);
-            hungryTimer = rand.Next(10, 31);
-            sinkingTimer = rand.Next(10, 31);
+            edgeBouncingX = true; // The fish should bounce at the left & right hand edges of the screen
+            
+            // Randomise the time before each behaviour starts
+            dashingTimer = GetCurrentTime() + rand.Next(5, 11);
+            acceleratingTimer = GetCurrentTime() + rand.Next(5, 11);
+            hungryTimer = GetCurrentTime() + rand.Next(5, 11);
+            sinkingTimer = GetCurrentTime() + rand.Next(5, 11);
         }
 
         #endregion
@@ -146,48 +160,159 @@ namespace FishORama
             switch(currentAction)
             {
                 case Action.Dashing:
-                    dashingTimer = 100;
-                    currentAction = Action.None;
+                    distanceSwum += mSpeedX;
+
+                    if(distanceSwum >= distanceToSwim)
+                    {
+                        mSpeedX = minSpeedX;
+
+                        dashingTimer = GetCurrentTime() + rand.Next(5, 11);
+
+                        currentAction = Action.None;
+                        Console.WriteLine("End Dashing                ");
+                    }
                     break;
                 case Action.Accelerating:
-                    acceleratingTimer = 100;
-                    currentAction = Action.None;
+
+                    if(currentTime >= acceleratingTimer)
+                    {
+                        if(mSpeedX > minSpeedX)
+                        {
+                            mSpeedX -= 0.02f;
+                        }
+                        else
+                        {
+                            acceleratingTimer = GetCurrentTime() + rand.Next(5, 11);
+
+                            currentAction = Action.None;
+                            Console.WriteLine("End Accelerating                ");
+                        }
+                    }
+                    else
+                    {
+                        if(mSpeedX < maxSpeedX)
+                        {
+                            mSpeedX += 0.02f;
+                        }
+                    }
                     break;
                 case Action.Hungry:
-                    hungryTimer = 100;
-                    currentAction = Action.None;
+                    distanceSwum += mSpeedX; // Increment distance swum by the amount the fish has moved since the last update
+
+                    if(distanceSwum >= distanceToSwim)
+                    {
+                        if(hitEdgeY) // If fish is at the top of screen
+                        {
+                            mSpeedY = 0; // Stop the fish moving upwards
+
+                            edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
+
+                            hungryTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish becomes hungry next
+
+                            currentAction = Action.None; // End behaviour
+                            Console.WriteLine("End Hungry - top of screen                ");
+                        }
+                        else
+                        {
+                            // Invert the fishes direction
+                            mFacingDirectionX *= -1;
+                            this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                                                                          this.PossessedToken.Orientation.Y,
+                                                                          this.PossessedToken.Orientation.Z);
+
+                            distanceSwum = 0; // Reset the distance the fish has swum
+                        }
+                    }
+
+                    if (currentTime >= hungryTimer)
+                    {
+                        mSpeedY = 0; // Stop the fish moving upwards
+
+                        edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
+
+                        hungryTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish becomes hungry next
+
+                        currentAction = Action.None; // End behaviour
+                        Console.WriteLine("End Hungry - end of time                ");
+                    }
                     break;
                 case Action.Sinking:
-                    sinkingTimer = 100;
-                    currentAction = Action.None;
+                    distanceSwum += mSpeedY; // Increment distance swum by the amount the fish has moved since the last update
+
+                    if(distanceSwum >= distanceToSwim)
+                    {
+                        mSpeedY = 0; // Stop fish moving downwards
+
+                        sinkingTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish sinks next
+
+                        currentAction = Action.None; // End behaviour
+                        Console.WriteLine("End Sinking                ");
+                    }
                     break;
                 case Action.None:
-                    if(dashingTimer <= 0)
+                    if (currentTime >= sinkingTimer)
                     {
-                        currentAction = Action.Dashing;
+                        currentAction = Action.Sinking; // Begin the sinking behaviour, starting from the next update
+
+                        // Start the fish moving downwards
+                        mSpeedY = 2;
+                        mFacingDirectionY = -1;
+
+                        distanceSwum = 0; // Reset distance swum counter
+                        distanceToSwim = rand.Next(50, 151); // Randomise distance the fish will swim
+
+                        Console.WriteLine("Begin Sinking                ");
                     }
-                    else if(acceleratingTimer <= 0)
+                    else if(currentTime >= acceleratingTimer)
                     {
                         currentAction = Action.Accelerating;
+
+                        acceleratingTimer = GetCurrentTime() + 15;
+
+                        Console.WriteLine("Begin Accelerating                ");
                     }
-                    else if(hungryTimer <= 0)
+                    else if(currentTime >= hungryTimer)
                     {
-                        currentAction = Action.Hungry;
+                        currentAction = Action.Hungry; // Begin the hungry behaviour, starting from the next update
+
+                        // Start the fish moving upwards
+                        mSpeedY = 1;
+                        mFacingDirectionY = 1;
+
+                        edgeBouncingX = false; // Prevent the fish from bouncing off the edge of the screen
+
+                        distanceSwum = 0; // Reset distance swum counter
+                        distanceToSwim = 150; // Set distance fish will swim before turning
+
+                        hungryTimer = GetCurrentTime() + 5; // Set maximum time behaviour will be active
+
+                        Console.WriteLine("Begin Hungry                ");
                     }
-                    else if(sinkingTimer <= 0)
+                    else if (currentTime >= dashingTimer)
                     {
-                        currentAction = Action.Sinking;
-                        distanceToSwim = rand.Next(50, 151);
+                        currentAction = Action.Dashing;
+
+                        mSpeedX = maxSpeedX;
+
+                        distanceSwum = 0;
+                        distanceToSwim = 250;
+
+                        Console.WriteLine("Begin Dashing                ");
                     }
                     break;
             }
+
+            Console.SetCursorPosition(0, 0);
+            Console.Write($"{currentAction}     \nSinking: {sinkingTimer - currentTime}     \nAccelerating: {acceleratingTimer - currentTime}     \nHungry: {hungryTimer - currentTime}     \nDashing: {dashingTimer - currentTime}     \n");
+            //Console.WriteLine($"Dashing: {dashingTimer - currentTime}");
+            //Console.WriteLine($"Accelerating: {acceleratingTimer - currentTime}");
+            //Console.WriteLine($"Hungry: {hungryTimer - currentTime}");
+            //Console.WriteLine($"Sinking: {sinkingTimer - currentTime}");
         }
 
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
         /// </summary>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
         private void Move()
         {
             tokenPosition.X += mSpeedX * mFacingDirectionX;
@@ -197,8 +322,6 @@ namespace FishORama
         /// <summary>
         /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
         /// </summary>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
         private void CheckPosition()
         {
             Vector3 relativePosition = tokenPosition - mAquarium.Position;
@@ -214,12 +337,21 @@ namespace FishORama
                     tokenPosition.X = (mAquarium.Width / 2); // Lock fish to right edge of screen
                 }
 
-                mFacingDirectionX *= -1;
+                if (edgeBouncingX) // If fish should bounce at this edge
+                {
+                    mFacingDirectionX *= -1; // Invert horizontal moving direction
+                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                                                                  this.PossessedToken.Orientation.Y,
+                                                                  this.PossessedToken.Orientation.Z);
+                }
 
-                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
-                                                              this.PossessedToken.Orientation.Y,
-                                                              this.PossessedToken.Orientation.Z);
+                hitEdgeX = true;
             }
+            else
+            {
+                hitEdgeX = false;
+            }
+
             if (Math.Abs(relativePosition.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
             {
                 if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
@@ -230,15 +362,24 @@ namespace FishORama
                 {
                     tokenPosition.Y = (mAquarium.Height / 2); // Lock fish to top of screen
                 }
+
+                if (edgeBouncingY) // If fish should bounce at this edge
+                {
+                    mFacingDirectionY *= -1; // Invert vertical moving direction
+                }
+
+                hitEdgeY = true;
+            }
+            else
+            {
+                hitEdgeY = false;
             }
         }
 
-        private void CheckTime()
+        /// <returns>The current system time in seconds</returns>
+        private int GetCurrentTime()
         {
-            dashingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
-            acceleratingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
-            hungryTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
-            sinkingTimer = (DateTime.Now.Second + DateTime.Now.Minute * 60) + startTime;
+            return DateTime.Now.Second + DateTime.Now.Minute * 60;
         }
 
         /// <summary>
@@ -251,11 +392,12 @@ namespace FishORama
 
             SpecialBehaviour();
             Move();
+
             CheckPosition();
 
-            CheckTime();
-
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
+
+            currentTime = GetCurrentTime();
 
 
             /* LEARNING PILL: This is a special method which gets called over and over again from somewhere within the FishORama framework based on Game time (A timer)

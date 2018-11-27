@@ -18,22 +18,20 @@ namespace FishORama
         // an instance variable a reference to its aquarium.
         private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
 
+        private Vector3 tokenPosition; // Stores the temporary position of the fish
+
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
         private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
         private float mSpeedX = 2; // Defines horizontal movement speed of the fish
         private float mSpeedY = 2; // Defines vertical movement speed of the fish
 
-        private enum Action
-        {
-            None,
-            Dashing,
-            Accelerating,
-            Hungry,
-            Sinking
-        }
-        private Action currentAction = Action.None; // Holds the current special action the fish is taking; holds 'None' while fish is using regular behaviour
+        private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
+        private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
 
+        private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
+        private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
+        
         #endregion
 
         #region Properties
@@ -62,7 +60,9 @@ namespace FishORama
              * from class AIPlayer.
              */
             this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing.            
+            mFacingDirectionX = 1;       // Current direction the fish is facing.   
+
+            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen         
         }
 
         #endregion
@@ -87,22 +87,16 @@ namespace FishORama
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
         /// </summary>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 Move(Vector3 tokenPosition)
+        private void Move()
         {
-            tokenPosition.X += mSpeedX;
-            tokenPosition.Y += mSpeedY;
-
-            return tokenPosition;
+            tokenPosition.X += mSpeedX * mFacingDirectionX;
+            tokenPosition.Y += mSpeedY * mFacingDirectionY;
         }
 
         /// <summary>
         /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
         /// </summary>
-        /// <param name="tokenPosition">Current position of the fish</param>
-        /// <returns>The fishes new position</returns>
-        private Vector3 CheckPosition(Vector3 tokenPosition)
+        private void CheckPosition()
         {
             Vector3 relativePosition = tokenPosition - mAquarium.Position;
 
@@ -117,12 +111,21 @@ namespace FishORama
                     tokenPosition.X = (mAquarium.Width / 2); // Lock fish to right edge of screen
                 }
 
-                mFacingDirectionX *= -1;
+                if (edgeBouncingX) // If fish should bounce at this edge
+                {
+                    mFacingDirectionX *= -1; // Invert horizontal moving direction
+                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                                                                  this.PossessedToken.Orientation.Y,
+                                                                  this.PossessedToken.Orientation.Z);
+                }
 
-                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
-                                                              this.PossessedToken.Orientation.Y,
-                                                              this.PossessedToken.Orientation.Z);
+                hitEdgeX = true;
             }
+            else
+            {
+                hitEdgeX = false;
+            }
+
             if (Math.Abs(relativePosition.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
             {
                 if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
@@ -133,9 +136,18 @@ namespace FishORama
                 {
                     tokenPosition.Y = (mAquarium.Height / 2); // Lock fish to top of screen
                 }
-            }
 
-            return tokenPosition;
+                if (edgeBouncingY) // If fish should bounce at this edge
+                {
+                    mFacingDirectionY *= -1; // Invert vertical moving direction
+                }
+
+                hitEdgeY = true;
+            }
+            else
+            {
+                hitEdgeY = false;
+            }
         }
 
         /// <summary>
@@ -144,10 +156,10 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            Vector3 tokenPosition = PossessedToken.Position; // Store the current position of the fish
+            tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
-            tokenPosition = Move(tokenPosition);
-            tokenPosition = CheckPosition(tokenPosition);
+            Move();
+            CheckPosition();
 
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
 
