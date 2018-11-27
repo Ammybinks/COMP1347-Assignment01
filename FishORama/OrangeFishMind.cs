@@ -60,10 +60,10 @@ namespace FishORama
         private Vector3 tokenPosition; // Stores the temporary position of the fish
 
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
-        private float mFacingDirectionY = 1;         // Vertical direction the fish is facing (1: up; -1: down).
+        private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
         private float mSpeedX = 2; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 5; // Defines vertical movement speed of the fish
+        private float mSpeedY = 0; // Defines vertical movement speed of the fish
 
         private float maxSpeedX = 12; // Defines the absolute maximum speed the fish will travel horizontally, after any behaviour modifiers
         private float maxSpeedY = 12; // Defines the absolute maximum speed the fish will travel vertically, after any behaviour modifiers
