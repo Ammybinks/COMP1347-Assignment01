@@ -87,7 +87,7 @@ namespace FishORama
 
         private Random rand = new Random(); // Initialise global random number generator
         
-        private int currentTime; // Stores the current time, captured every update. Checked against startTime to determine total time since the last behaviour ended
+        private int currentTime; // Stores the current time, captured every update. Checked against each timer to determine time remaining before each behaviour starts
 
         // Initialise timers for each individual behaviour
         private int dashingTimer;
@@ -130,10 +130,10 @@ namespace FishORama
             edgeBouncingX = true; // The fish should bounce at the left & right hand edges of the screen
             
             // Randomise the time before each behaviour starts
-            dashingTimer = GetCurrentTime() + rand.Next(5, 11);
-            acceleratingTimer = GetCurrentTime() + rand.Next(5, 11);
-            hungryTimer = GetCurrentTime() + rand.Next(5, 11);
-            sinkingTimer = GetCurrentTime() + rand.Next(5, 11);
+            dashingTimer = GetCurrentTime() + rand.Next(0, 26);
+            acceleratingTimer = GetCurrentTime() + rand.Next(0, 26);
+            hungryTimer = GetCurrentTime() + rand.Next(0, 26);
+            sinkingTimer = GetCurrentTime() + rand.Next(0, 26);
         }
 
         #endregion
@@ -160,39 +160,39 @@ namespace FishORama
             switch(currentAction)
             {
                 case Action.Dashing:
-                    distanceSwum += mSpeedX;
+                    distanceSwum += mSpeedX; // Increment distance swum by the amount the fish has moved since the last update
 
-                    if(distanceSwum >= distanceToSwim)
+                    if (distanceSwum >= distanceToSwim)
                     {
-                        mSpeedX = minSpeedX;
+                        mSpeedX = minSpeedX; // Set the fishes speed to its minimum
 
-                        dashingTimer = GetCurrentTime() + rand.Next(5, 11);
+                        dashingTimer = GetCurrentTime() + rand.Next(5, 31);  // Randomise the time before the fish dashes next
 
-                        currentAction = Action.None;
+                        currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Dashing                ");
                     }
                     break;
                 case Action.Accelerating:
 
-                    if(currentTime >= acceleratingTimer)
+                    if(currentTime >= acceleratingTimer) // If the timer has been reached, and the fish should be decelerating
                     {
-                        if(mSpeedX > minSpeedX)
+                        if(mSpeedX > minSpeedX) // If speed has not yet reached its minimum
                         {
-                            mSpeedX -= 0.02f;
+                            mSpeedX -= 0.02f; // Decrease speed slightly
                         }
                         else
                         {
-                            acceleratingTimer = GetCurrentTime() + rand.Next(5, 11);
+                            acceleratingTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish accelerates next
 
-                            currentAction = Action.None;
+                            currentAction = Action.None; // End behaviour
                             Console.WriteLine("End Accelerating                ");
                         }
                     }
-                    else
+                    else // Else the fish should be accelerating
                     {
-                        if(mSpeedX < maxSpeedX)
+                        if(mSpeedX < maxSpeedX) // If speed has not yet reached its maximum
                         {
-                            mSpeedX += 0.02f;
+                            mSpeedX += 0.02f; // Increase speed slightly
                         }
                     }
                     break;
@@ -207,7 +207,7 @@ namespace FishORama
 
                             edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
 
-                            hungryTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish becomes hungry next
+                            hungryTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish becomes hungry next
 
                             currentAction = Action.None; // End behaviour
                             Console.WriteLine("End Hungry - top of screen                ");
@@ -230,7 +230,7 @@ namespace FishORama
 
                         edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
 
-                        hungryTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish becomes hungry next
+                        hungryTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish becomes hungry next
 
                         currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Hungry - end of time                ");
@@ -243,7 +243,7 @@ namespace FishORama
                     {
                         mSpeedY = 0; // Stop fish moving downwards
 
-                        sinkingTimer = GetCurrentTime() + rand.Next(5, 11); // Randomise the time before the fish sinks next
+                        sinkingTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish sinks next
 
                         currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Sinking                ");
@@ -259,15 +259,15 @@ namespace FishORama
                         mFacingDirectionY = -1;
 
                         distanceSwum = 0; // Reset distance swum counter
-                        distanceToSwim = rand.Next(50, 151); // Randomise distance the fish will swim
+                        distanceToSwim = rand.Next(50, 151); // Randomise distance the fish will swim before the behaviour ends
 
                         Console.WriteLine("Begin Sinking                ");
                     }
                     else if(currentTime >= acceleratingTimer)
                     {
-                        currentAction = Action.Accelerating;
+                        currentAction = Action.Accelerating; // Begin the accelerating behaviour, starting from the next update
 
-                        acceleratingTimer = GetCurrentTime() + 15;
+                        acceleratingTimer = GetCurrentTime() + 15; // Set the amount of time before the fish decelerates
 
                         Console.WriteLine("Begin Accelerating                ");
                     }
@@ -290,12 +290,12 @@ namespace FishORama
                     }
                     else if (currentTime >= dashingTimer)
                     {
-                        currentAction = Action.Dashing;
+                        currentAction = Action.Dashing; // Begin the dashing behaviour, starting from the next update
 
-                        mSpeedX = maxSpeedX;
+                        mSpeedX = maxSpeedX; // Set the fishes speed to its maximum
 
-                        distanceSwum = 0;
-                        distanceToSwim = 250;
+                        distanceSwum = 0; // Reset distance swum counter
+                        distanceToSwim = 250; // Set the distance the fish will swim before the behaviour ends
 
                         Console.WriteLine("Begin Dashing                ");
                     }
@@ -304,10 +304,6 @@ namespace FishORama
 
             Console.SetCursorPosition(0, 0);
             Console.Write($"{currentAction}     \nSinking: {sinkingTimer - currentTime}     \nAccelerating: {acceleratingTimer - currentTime}     \nHungry: {hungryTimer - currentTime}     \nDashing: {dashingTimer - currentTime}     \n");
-            //Console.WriteLine($"Dashing: {dashingTimer - currentTime}");
-            //Console.WriteLine($"Accelerating: {acceleratingTimer - currentTime}");
-            //Console.WriteLine($"Hungry: {hungryTimer - currentTime}");
-            //Console.WriteLine($"Sinking: {sinkingTimer - currentTime}");
         }
 
         /// <summary>
