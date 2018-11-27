@@ -18,6 +18,8 @@ namespace FishORama
         // an instance variable a reference to its aquarium.
         private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
 
+        private Vector3 mSize; // Size of the possessed tokens' visible dimensions, for collisions
+
         private Vector3 tokenPosition; // Stores the temporary position of the fish
 
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
@@ -42,6 +44,11 @@ namespace FishORama
         public AquariumToken Aquarium
         {
             set { mAquarium = value; }
+        }
+
+        public Vector3 Size
+        {
+            set { mSize = value; }
         }
 
         #endregion
@@ -100,15 +107,15 @@ namespace FishORama
         {
             Vector3 relativePosition = tokenPosition - mAquarium.Position;
 
-            if (Math.Abs(relativePosition.X) >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
+            if (Math.Abs(relativePosition.X) + mSize.X >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
             {
                 if (relativePosition.X <= 0) // If the left edge of the screen was hit
                 {
-                    tokenPosition.X = (mAquarium.Width / 2) * -1; // Lock fish to left edge of screen
+                    tokenPosition.X = ((mAquarium.Width / 2) - mSize.X) * -1; // Lock fish to left edge of screen
                 }
                 else if (relativePosition.X > 0) // If the right edge of the screen was hit
                 {
-                    tokenPosition.X = (mAquarium.Width / 2); // Lock fish to right edge of screen
+                    tokenPosition.X = (mAquarium.Width / 2) - mSize.X; // Lock fish to right edge of screen
                 }
 
                 if (edgeBouncingX) // If fish should bounce at this edge
@@ -126,15 +133,15 @@ namespace FishORama
                 hitEdgeX = false;
             }
 
-            if (Math.Abs(relativePosition.Y) >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
+            if (Math.Abs(relativePosition.Y) + mSize.Y >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
             {
                 if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
                 {
-                    tokenPosition.Y = (mAquarium.Height / 2) * -1; // Lock fish to bottom edge of screen
+                    tokenPosition.Y = ((mAquarium.Height / 2) - mSize.Y) * -1; // Lock fish to bottom edge of screen
                 }
                 else if (relativePosition.Y > 0) // If the top edge of the screen was hit
                 {
-                    tokenPosition.Y = (mAquarium.Height / 2); // Lock fish to top of screen
+                    tokenPosition.Y = (mAquarium.Height / 2) - mSize.Y; // Lock fish to top of screen
                 }
 
                 if (edgeBouncingY) // If fish should bounce at this edge
