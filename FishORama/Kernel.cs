@@ -100,6 +100,11 @@ namespace FishORama
                                     // Creation and initialization is performed in the LoadContent method.
 
 
+        int seahorseNum = 3; // Number of seahorses placed in the aquarium
+
+        SeahorseToken[] seahorses; // Array of all seahorses in the aquarium
+
+        private Random rand = new Random(); // Initialise global random number generator
 
         #endregion
 
@@ -132,6 +137,8 @@ namespace FishORama
         public Kernel(): base("FishO'Rama")
         {
             this.IsMouseVisible = true;     // Display mouse cursor.
+
+            seahorses = new SeahorseToken[seahorseNum];
         }
         
         #endregion
@@ -202,6 +209,16 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
+            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            A = new X2DAsset("SeahorseVisuals", "Seahorse").
+                UVOriginAt(37, 64).
+                UVTopLeftCornerAt(0, 0).
+                Width(74).
+                Height(128); 
+
+            // Import orange fish visual asset in the library
+            lib.ImportAsset(A);
+
             // Return library.
             return lib;
         }
@@ -220,13 +237,6 @@ namespace FishORama
             // Note, the third parameter is set to 0 because unused in FishORama.
             mScene = XNAGame.CreateA2DScene(800, 600, 0);
 
-            /*
-             * Create Tokens
-             */
-            AquariumToken aquarium = new AquariumToken("Aquarium", this, 800, 600);         // Create aquarium token.
-
-            OrangeFishToken supaOrangeFish = new OrangeFishToken("SupaOrangeFish", aquarium); // Create SupaOrangeFish token
-                        
             /* LEARNING PILL: placing tokens in a scene.
              * In order to be managed by the Machinationis Ratio engine, tokens must be placed
              * in a scene.
@@ -240,16 +250,29 @@ namespace FishORama
              */
 
             /*
-             * Place tokens in the scene.
+             * Create tokens & place them in the scene.
              */
 
             Vector3 tokenPos;        // Empty Vector3 object to be used to position tokens.
-
+            
+            AquariumToken aquarium = new AquariumToken("Aquarium", this, 800, 600);         // Create aquarium token.
             tokenPos = new Vector3(0, 0, 0);            // Define scene position for the aquarium.
             mScene.Place(aquarium, tokenPos);           // Place token in scene.
 
+            OrangeFishToken supaOrangeFish = new OrangeFishToken("SupaOrangeFish", aquarium, rand); // Create SupaOrangeFish token
             tokenPos = new Vector3(0, 0, 1); // Define position for SupaOrangeFish
             mScene.Place(supaOrangeFish, tokenPos); // Place token in scene
+
+            for (int i = 0; i < seahorseNum; i++)
+            {
+                SeahorseToken seahorse = new SeahorseToken("Seahorse 1", aquarium, rand);
+
+                tokenPos = new Vector3(rand.Next(-200, 201), rand.Next(-200, 201), 1); // Define position for Seahorse
+                mScene.Place(seahorse, tokenPos); // Place token in scene
+
+                seahorses[i] = seahorse;
+            }
+
 
             /*
              * Create and Initialize camera

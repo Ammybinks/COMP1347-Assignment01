@@ -98,6 +98,8 @@ namespace FishORama
 
         private Vector3 mSize; // Size of the fishes visible dimensions, for collisions
 
+        private Random mRand; // Store refence to global random number generator
+
         #endregion
 
         #region Properties
@@ -110,6 +112,11 @@ namespace FishORama
             get { return mAquarium; }
         }
         
+        public Random Rand
+        {
+            get { return mRand; }
+        }
+
         #endregion
 
         #region Constructors
@@ -119,10 +126,12 @@ namespace FishORama
         /// initialize custom members.
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
-        public OrangeFishToken(String pTokenName, AquariumToken pAquarium)
+        public OrangeFishToken(String pTokenName, AquariumToken pAquarium, Random rand)
             : base(pTokenName) {
-                mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
-                mMind.Aquarium = mAquarium;     // Provide to the mind a reference to the aquarium, required to swim appropriately.
+            mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
+            mMind.Aquarium = mAquarium;     // Provide to the mind a reference to the aquarium, required to swim appropriately.
+
+            mRand = rand; // Store reference to random number generator, to be sent to the mind
         }
 
         #endregion
@@ -172,7 +181,7 @@ namespace FishORama
             mMind = myMind;     // Store explicit reference to mind being used.
             mMind.Aquarium = mAquarium;   // Provide to mind explicit reference to Aquarium.
 
-            mSize = new Vector3(65, 65, 0);
+            mSize = new Vector3(64, 64, 0);
             mMind.Size = mSize; // Provide to mind the dimensions of the token
         }
 

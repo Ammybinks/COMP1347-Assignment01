@@ -7,7 +7,7 @@ using XNAMachinationisRatio;        // Required to use the XNA Machinationis Rat
 
 namespace FishORama
 {
-    class BaseFishToken : X2DToken
+    class SeahorseToken : X2DToken
     {
         #region Data members
 
@@ -16,7 +16,7 @@ namespace FishORama
         // which is why it stores in an instance variable a reference to its aquarium.
         private AquariumToken mAquarium;    // Reference to the aquarium in which the creature lives.
 
-        private BaseFishMind mMind;       // Explicit reference to the mind the token is using to enact its behaviors.
+        private SeahorseMind mMind;       // Explicit reference to the mind the token is using to enact its behaviors.
 
         private Vector3 mSize; // Size of the fishes visible dimensions, for collisions
 
@@ -48,10 +48,12 @@ namespace FishORama
         /// initialize custom members.
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
-        public BaseFishToken(String pTokenName, AquariumToken pAquarium, Random rand)
+        public SeahorseToken(String pTokenName, AquariumToken pAquarium, Random rand)
             : base(pTokenName) {
             mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
             mMind.Aquarium = mAquarium;     // Provide to the mind a reference to the aquarium, required to swim appropriately.
+            
+            Orientation = new Vector3(-1, Orientation.Y, Orientation.Z);
 
             mRand = rand; // Store reference to random number generator, to be sent to the mind
         }
@@ -76,7 +78,7 @@ namespace FishORama
             // Specify which image should be associated to this token, assigning
             // the name of the graphic asset to be used ("OrangeFishVisuals" in this case)
             // to the property 'GraphicProperties.AssetID' of the token.
-            this.GraphicProperties.AssetID = "OrangeFishVisuals";
+            this.GraphicProperties.AssetID = "SeahorseVisuals";
 
             // Specify mass of the fish. This can be used by
             // physics-based behaviors (work in progress, not functional yet).
@@ -98,13 +100,13 @@ namespace FishORama
              * behavior. The behavior is implemented through the class SimpleSwimMind.
              */
 
-            BaseFishMind myMind = new BaseFishMind(this);   // Create mind, implicitly associating it to the token.
+            SeahorseMind myMind = new SeahorseMind(this);   // Create mind, implicitly associating it to the token.
 
 
             mMind = myMind;     // Store explicit reference to mind being used.
             mMind.Aquarium = mAquarium;   // Provide to mind explicit reference to Aquarium.
 
-            mSize = new Vector3(65, 65, 0);
+            mSize = new Vector3(37, 64, 0);
             mMind.Size = mSize; // Provide to mind the dimensions of the token
         }
 

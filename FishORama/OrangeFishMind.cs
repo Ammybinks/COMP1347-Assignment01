@@ -87,8 +87,10 @@ namespace FishORama
         }
         private Action currentAction = Action.None; // Holds the current special action the fish is taking; holds 'None' while fish is using regular behaviour
 
-        private Random rand = new Random(); // Initialise global random number generator
-        
+        private Random mRand; // Store refence to global random number generator
+
+        private bool firstUpdate = true;
+
         private int currentTime; // Stores the current time, captured every update. Checked against each timer to determine time remaining before each behaviour starts
 
         // Initialise timers for each individual behaviour
@@ -99,6 +101,7 @@ namespace FishORama
 
         private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
         private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
+
         #endregion
 
         #region Properties
@@ -136,11 +139,6 @@ namespace FishORama
 
             edgeBouncingX = true; // The fish should bounce at the left & right hand edges of the screen
             
-            // Randomise the time before each behaviour starts
-            dashingTimer = GetCurrentTime() + rand.Next(0, 26);
-            acceleratingTimer = GetCurrentTime() + rand.Next(0, 26);
-            hungryTimer = GetCurrentTime() + rand.Next(0, 26);
-            sinkingTimer = GetCurrentTime() + rand.Next(0, 26);
         }
 
         #endregion
@@ -162,6 +160,9 @@ namespace FishORama
          * 
          */
 
+        /// <summary>
+        /// Changes the fishes behaviour based on randomised timers
+        /// </summary>
         private void SpecialBehaviour()
         {
             switch(currentAction)
@@ -173,7 +174,7 @@ namespace FishORama
                     {
                         mSpeedX = minSpeedX; // Set the fishes speed to its minimum
 
-                        dashingTimer = GetCurrentTime() + rand.Next(5, 31);  // Randomise the time before the fish dashes next
+                        dashingTimer = GetCurrentTime() + mRand.Next(5, 31);  // Randomise the time before the fish dashes next
 
                         currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Dashing                ");
@@ -189,7 +190,7 @@ namespace FishORama
                         }
                         else
                         {
-                            acceleratingTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish accelerates next
+                            acceleratingTimer = GetCurrentTime() + mRand.Next(5, 31); // Randomise the time before the fish accelerates next
 
                             currentAction = Action.None; // End behaviour
                             Console.WriteLine("End Accelerating                ");
@@ -214,7 +215,7 @@ namespace FishORama
 
                             edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
 
-                            hungryTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish becomes hungry next
+                            hungryTimer = GetCurrentTime() + mRand.Next(5, 31); // Randomise the time before the fish becomes hungry next
 
                             currentAction = Action.None; // End behaviour
                             Console.WriteLine("End Hungry - top of screen                ");
@@ -237,7 +238,7 @@ namespace FishORama
 
                         edgeBouncingX = true; // Allow the fish to bounce off the edge of the screen again
 
-                        hungryTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish becomes hungry next
+                        hungryTimer = GetCurrentTime() + mRand.Next(5, 31); // Randomise the time before the fish becomes hungry next
 
                         currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Hungry - end of time                ");
@@ -250,7 +251,7 @@ namespace FishORama
                     {
                         mSpeedY = 0; // Stop fish moving downwards
 
-                        sinkingTimer = GetCurrentTime() + rand.Next(5, 31); // Randomise the time before the fish sinks next
+                        sinkingTimer = GetCurrentTime() + mRand.Next(5, 31); // Randomise the time before the fish sinks next
 
                         currentAction = Action.None; // End behaviour
                         Console.WriteLine("End Sinking                ");
@@ -266,7 +267,7 @@ namespace FishORama
                         mFacingDirectionY = -1;
 
                         distanceSwum = 0; // Reset distance swum counter
-                        distanceToSwim = rand.Next(50, 151); // Randomise distance the fish will swim before the behaviour ends
+                        distanceToSwim = mRand.Next(50, 151); // Randomise distance the fish will swim before the behaviour ends
 
                         Console.WriteLine("Begin Sinking                ");
                     }
@@ -391,6 +392,19 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
+            if(firstUpdate)
+            {
+                mRand = (PossessedToken as OrangeFishToken).Rand;
+
+                // Randomise the time before each behaviour starts
+                dashingTimer = GetCurrentTime() + mRand.Next(0, 26);
+                acceleratingTimer = GetCurrentTime() + mRand.Next(0, 26);
+                hungryTimer = GetCurrentTime() + mRand.Next(0, 26);
+                sinkingTimer = GetCurrentTime() + mRand.Next(0, 26);
+
+                firstUpdate = false;
+            }
+
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
             SpecialBehaviour();

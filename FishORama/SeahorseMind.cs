@@ -8,7 +8,7 @@ using XNAMachinationisRatio.AI;             // Required to use the XNA Machinati
 
 namespace FishORama
 {
-    class BaseFishMind :AIPlayer
+    class SeahorseMind :AIPlayer
     {
         #region Data Members
 
@@ -33,6 +33,10 @@ namespace FishORama
 
         private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
         private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
+
+        private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
+        private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
+        private float defaultDistanceToSwim;
 
         private Random mRand; // Store refence to global random number generator
 
@@ -63,7 +67,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
-        public BaseFishMind(X2DToken pToken)
+        public SeahorseMind(X2DToken pToken)
         {
             /* LEARNING PILL: associating a mind with a token
              * In order for a mind to control a token, it must be associated with the token.
@@ -71,9 +75,15 @@ namespace FishORama
              * from class AIPlayer.
              */
             this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing.   
+            mFacingDirectionX = 1;       // Current direction the fish is facing. 
+            mFacingDirectionY = -1;  
 
-            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen         
+            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen
+            edgeBouncingY = true;
+
+            distanceSwum = 100;
+            defaultDistanceToSwim = 200;
+            distanceToSwim = 200;  
         }
 
         #endregion
@@ -94,6 +104,25 @@ namespace FishORama
          * a method invoked by Update, then it is IGNORED.
          * 
          */
+
+        private void SpecialBehaviour()
+        {
+            distanceSwum += mSpeedY;
+
+            if(hitEdgeY)
+            {
+                distanceToSwim = distanceSwum;
+
+                distanceSwum = 0;
+            }
+            else if(distanceSwum >= distanceToSwim)
+            {
+                distanceSwum = 0;
+                distanceToSwim = defaultDistanceToSwim;
+
+                mFacingDirectionY *= -1;
+            }
+        }
 
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
@@ -125,7 +154,7 @@ namespace FishORama
                 if (edgeBouncingX) // If fish should bounce at this edge
                 {
                     mFacingDirectionX *= -1; // Invert horizontal moving direction
-                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
                                                                   this.PossessedToken.Orientation.Y,
                                                                   this.PossessedToken.Orientation.Z);
                 }
@@ -152,7 +181,7 @@ namespace FishORama
                 {
                     mFacingDirectionY *= -1; // Invert vertical moving direction
                 }
-
+                
                 hitEdgeY = true;
             }
             else
@@ -169,14 +198,19 @@ namespace FishORama
         {
             if (firstUpdate)
             {
-                mRand = (PossessedToken as OrangeFishToken).Rand;
+                mRand = (PossessedToken as SeahorseToken).Rand;
+
+                mSpeedX = mRand.Next(5, 11);
+                mSpeedY = mSpeedX;
 
                 firstUpdate = false;
             }
 
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
+            SpecialBehaviour();
             Move();
+
             CheckPosition();
 
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
