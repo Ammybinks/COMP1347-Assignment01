@@ -39,6 +39,11 @@ namespace FishORama
             get { return mRand; }
         }
 
+        public Vector3 Size
+        {
+            get { return mSize; }
+        }
+
         #endregion
 
         #region Constructors

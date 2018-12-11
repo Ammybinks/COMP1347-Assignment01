@@ -8,11 +8,21 @@ namespace XNAMachinationisRatio {
     /// Token is a game object Renderable and Collidable by default
     /// </summary>
     public abstract class X2DToken : GameObject {
-        
+
+        protected Random mRand; // Store refence to global random number generator
+
         protected X2DToken(String pTokenName)
             : base(pTokenName, Vector3.Zero) {
-                InjectComponents(); 
-                DefaultProperties();
+            InjectComponents(); 
+            DefaultProperties();
+        }
+        protected X2DToken(String pTokenName, Random rand)
+            : base(pTokenName, Vector3.Zero)
+        {
+            mRand = rand;
+
+            InjectComponents();
+            DefaultProperties();
         }
 
         public override Dimension Type { get { return Dimension.X2D; } }

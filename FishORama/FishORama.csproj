@@ -49,6 +49,8 @@
     <Compile Include="Kernel.cs" />
     <Compile Include="OrangeFishMind.cs" />
     <Compile Include="OrangeFishToken.cs" />
+    <Compile Include="PiranhaMind.cs" />
+    <Compile Include="PiranhaToken.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SeahorseMind.cs" />

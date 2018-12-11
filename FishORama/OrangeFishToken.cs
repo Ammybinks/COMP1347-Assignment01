@@ -117,6 +117,11 @@ namespace FishORama
             get { return mRand; }
         }
 
+        public Vector3 Size
+        {
+            get { return mSize; }
+        }
+
         #endregion
 
         #region Constructors
@@ -181,7 +186,7 @@ namespace FishORama
             mMind = myMind;     // Store explicit reference to mind being used.
             mMind.Aquarium = mAquarium;   // Provide to mind explicit reference to Aquarium.
 
-            mSize = new Vector3(64, 64, 0);
+            mSize = new Vector3(64, 42, 0);
             mMind.Size = mSize; // Provide to mind the dimensions of the token
         }
 

@@ -201,7 +201,7 @@ namespace FishORama
 
             // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
             A = new X2DAsset("OrangeFishVisuals", "OrangeFish").
-                UVOriginAt(64, 64).
+                UVOriginAt(64, 42).
                 UVTopLeftCornerAt(0, 0).
                 Width(128).
                 Height(84);
@@ -215,6 +215,26 @@ namespace FishORama
                 UVTopLeftCornerAt(0, 0).
                 Width(74).
                 Height(128); 
+
+            // Import orange fish visual asset in the library
+            lib.ImportAsset(A);
+
+            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            A = new X2DAsset("PiranhaVisuals1", "Piranha1").
+                UVOriginAt(66, 64).
+                UVTopLeftCornerAt(0, 0).
+                Width(132).
+                Height(128);
+
+            // Import orange fish visual asset in the library
+            lib.ImportAsset(A);
+
+            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            A = new X2DAsset("PiranhaVisuals2", "Piranha2").
+                UVOriginAt(66, 64).
+                UVTopLeftCornerAt(0, 0).
+                Width(132).
+                Height(128);
 
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
@@ -265,13 +285,17 @@ namespace FishORama
 
             for (int i = 0; i < seahorseNum; i++)
             {
-                SeahorseToken seahorse = new SeahorseToken("Seahorse 1", aquarium, rand);
-
-                tokenPos = new Vector3(rand.Next(-200, 201), rand.Next(-200, 201), 1); // Define position for Seahorse
+                SeahorseToken seahorse = new SeahorseToken("Seahorse 1", aquarium, rand, i);
+                
+                tokenPos = new Vector3(rand.Next(-400 + (int)seahorse.Size.X, 401 - (int)seahorse.Size.X), rand.Next(-300 + (int)seahorse.Size.Y, 301 - (int)seahorse.Size.Y), 1); // Randomise position for Seahorse
                 mScene.Place(seahorse, tokenPos); // Place token in scene
 
                 seahorses[i] = seahorse;
             }
+
+            PiranhaToken piranha = new PiranhaToken("SupaOrangeFish", aquarium, rand); // Create SupaOrangeFish token
+            tokenPos = new Vector3(rand.Next(-400 + (int)piranha.Size.X, 401 - (int)piranha.Size.X), rand.Next(-300 + (int)piranha.Size.Y, 301 - (int)piranha.Size.Y), 1); // Randomise position for Piranha
+            mScene.Place(piranha, tokenPos); // Place token in scene
 
 
             /*

@@ -8,7 +8,7 @@ using XNAMachinationisRatio.AI;             // Required to use the XNA Machinati
 
 namespace FishORama
 {
-    class SeahorseMind :AIPlayer
+    class PiranhaMind : AIPlayer
     {
         #region Data Members
 
@@ -25,8 +25,8 @@ namespace FishORama
         private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
         private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
-        private float mSpeedX = 2; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 2; // Defines vertical movement speed of the fish
+        private float mSpeedX = 5; // Defines horizontal movement speed of the fish
+        private float mSpeedY = 0; // Defines vertical movement speed of the fish
 
         private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
         private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
@@ -34,14 +34,11 @@ namespace FishORama
         private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
         private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
 
-        private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
-        private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
-        private float defaultDistanceToSwim;
+        private bool feeding = false;
 
         private Random mRand; // Store refence to global random number generator
 
-        private bool scared = false;
-        private bool chickenLegActive;
+        private Vector3 chickenLegPosition;
 
         private bool firstUpdate = true;
 
@@ -62,14 +59,6 @@ namespace FishORama
             set { mSize = value; }
         }
 
-        public int Speed
-        {
-            set
-            {
-                mSpeedX = value;
-                mSpeedY = value;
-            }
-        }
         #endregion
 
         #region Constructors
@@ -78,7 +67,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
-        public SeahorseMind(X2DToken pToken)
+        public PiranhaMind(X2DToken pToken)
         {
             /* LEARNING PILL: associating a mind with a token
              * In order for a mind to control a token, it must be associated with the token.
@@ -86,15 +75,12 @@ namespace FishORama
              * from class AIPlayer.
              */
             this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing. 
-            mFacingDirectionY = -1;  
+            mFacingDirectionX = 1;       // Current direction the fish is facing.   
 
-            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen
-            edgeBouncingY = true;
-            
-            defaultDistanceToSwim = 200;
+            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen        
 
-            SetRegularBehaviour();
+            Console.SetCursorPosition(0, 9);
+            Console.Write("Regular        ");
         }
 
         #endregion
@@ -118,49 +104,33 @@ namespace FishORama
 
         private void SpecialBehaviour()
         {
-            if(mAquarium.ChickenLeg != null)
+            if (mAquarium.ChickenLeg != null)
             {
-                if(!chickenLegActive)
+                if(!feeding)
                 {
-                    scared = true;
+                    feeding = true;
 
-                    edgeBouncingX = false;
-                    edgeBouncingY = false;
+                    (PossessedToken as PiranhaToken).SwitchSprite();
 
-                    chickenLegActive = true;
-
-                    distanceSwum = 0;
-                    distanceToSwim = 100;
-
-                    Console.SetCursorPosition(0, 6 + (PossessedToken as SeahorseToken).Index);
-                    Console.Write("Scared       ");
+                    Console.SetCursorPosition(0, 9);
+                    Console.Write("Hungry        ");
                 }
-            }
-            else
-            {
-                if(chickenLegActive)
-                {
-                    chickenLegActive = false;
 
-                    if(scared)
-                    {
-                        SetRegularBehaviour();
-                    }
-                }
-            }
-            
-            if(scared)
-            {
-                Vector3 chickenLegPosition = mAquarium.ChickenLeg.Position;
+                chickenLegPosition = mAquarium.ChickenLeg.Position;
 
-                Vector2 tempPosition1 = new Vector2(tokenPosition.X - chickenLegPosition.X, tokenPosition.Y - chickenLegPosition.Y);
+                Vector2 tempPosition1 = new Vector2(chickenLegPosition.X - tokenPosition.X, chickenLegPosition.Y - tokenPosition.Y);
                 Vector2 tempPosition2 = tempPosition1;
                 tempPosition1 = Vector2.Normalize(tempPosition1);
                 tempPosition1 *= mSpeedX;
-                
-                if (distanceSwum >= distanceToSwim)
+
+                if(Math.Abs(tempPosition1.X) > Math.Abs(tempPosition2.X) && Math.Abs(tempPosition1.Y) > Math.Abs(tempPosition2.Y))
                 {
-                    SetRegularBehaviour();
+                    mAquarium.RemoveChickenLeg();
+
+                    feeding = false;
+
+                    Console.SetCursorPosition(0, 9);
+                    Console.Write("Regular        ");
                 }
                 else
                 {
@@ -180,45 +150,8 @@ namespace FishORama
                     }
 
                     tokenPosition += new Vector3(tempPosition1.X, tempPosition1.Y, 0);
-
-                    distanceSwum += mSpeedX;
-                }
-
-            }
-            else
-            {
-                if (hitEdgeY)
-                {
-                    distanceToSwim = distanceSwum - (mSpeedY * 2);
-
-                    distanceSwum = 0;
-                }
-                else if (distanceSwum >= distanceToSwim)
-                {
-                    distanceSwum = 0;
-                    distanceToSwim = defaultDistanceToSwim;
-
-                    mFacingDirectionY *= -1;
-                }
-                else
-                {
-                    distanceSwum += mSpeedY;
                 }
             }
-        }
-
-        private void SetRegularBehaviour()
-        {
-            scared = false;
-
-            edgeBouncingX = true;
-            edgeBouncingY = true;
-            
-            distanceSwum = 100 + (mSpeedY);
-            distanceToSwim = defaultDistanceToSwim;
-
-            Console.SetCursorPosition(0, 6 + (PossessedToken as SeahorseToken).Index);
-            Console.Write("Regular         ");
         }
 
         /// <summary>
@@ -226,8 +159,11 @@ namespace FishORama
         /// </summary>
         private void Move()
         {
-            tokenPosition.X += mSpeedX * mFacingDirectionX;
-            tokenPosition.Y += mSpeedY * mFacingDirectionY;
+            if(!feeding)
+            {
+                tokenPosition.X += mSpeedX * mFacingDirectionX;
+                tokenPosition.Y += mSpeedY * mFacingDirectionY;
+            }
         }
 
         /// <summary>
@@ -268,20 +204,17 @@ namespace FishORama
                 if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
                 {
                     tokenPosition.Y = ((mAquarium.Height / 2) - mSize.Y) * -1; // Lock fish to bottom edge of screen
-
-                    mFacingDirectionY = 1; // Invert vertical moving direction
                 }
                 else if (relativePosition.Y > 0) // If the top edge of the screen was hit
                 {
                     tokenPosition.Y = (mAquarium.Height / 2) - mSize.Y; // Lock fish to top of screen
-
-                    mFacingDirectionY = -1; // Invert vertical moving direction
                 }
 
                 if (edgeBouncingY) // If fish should bounce at this edge
                 {
+                    mFacingDirectionY *= -1; // Invert vertical moving direction
                 }
-                
+
                 hitEdgeY = true;
             }
             else
@@ -296,31 +229,21 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            //if (firstUpdate)
-            //{
-            //    mRand = (PossessedToken as SeahorseToken).Rand;
+            if (firstUpdate)
+            {
+                mRand = (PossessedToken as PiranhaToken).Rand;
 
-            //    mSpeedX = mRand.Next(1, 6);
-            //    mSpeedY = mSpeedX;
-
-            //    firstUpdate = false;
-            //}
+                firstUpdate = false;
+            }
 
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
-            if (!scared)
-            {
-                Move();
-            }
-
             SpecialBehaviour();
-
+            Move();
             CheckPosition();
 
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
 
-            Console.SetCursorPosition(0, 6 + (PossessedToken as SeahorseToken).Index);
-            Console.Write($"{mFacingDirectionY}, {distanceSwum}, {distanceToSwim}, {hitEdgeY}         ");
 
             /* LEARNING PILL: This is a special method which gets called over and over again from somewhere within the FishORama framework based on Game time (A timer)
             *  the method in thoery is like a loop, but after each iteration unlike a look, it will allow you see what happened during that iteration
