@@ -16,27 +16,29 @@ namespace FishORama
         // since it needs to know where are the aquarium's boundaries.
         // Hence, the mind needs a "link" to the aquarium, which is why it stores in
         // an instance variable a reference to its aquarium.
-        private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
+        protected AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
 
-        private Vector3 mSize; // Size of the possessed tokens' visible dimensions, for collisions
+        protected Vector3 mSize; // Size of the possessed tokens' visible dimensions, for collisions
 
-        private Vector3 tokenPosition; // Stores the temporary position of the fish
+        protected Vector3 tokenPosition; // Stores the temporary position of the fish
 
-        private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
-        private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
+        protected float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
+        protected float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
 
-        private float mSpeedX = 2; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 2; // Defines vertical movement speed of the fish
+        protected int mRenderDirection = -1;
 
-        private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
-        private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
+        protected float mSpeedX = 2; // Defines horizontal movement speed of the fish
+        protected float mSpeedY = 2; // Defines vertical movement speed of the fish
 
-        private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
-        private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
+        protected bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
+        protected bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
 
-        private Random mRand; // Store refence to global random number generator
+        protected bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
+        protected bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
 
-        private bool firstUpdate = true;
+        protected Random mRand; // Store refence to global random number generator
+
+        protected bool firstUpdate = true;
 
         #endregion
 
@@ -54,7 +56,7 @@ namespace FishORama
         {
             set { mSize = value; }
         }
-
+        
         #endregion
 
         #region Constructors
@@ -95,10 +97,15 @@ namespace FishORama
          * 
          */
 
+        private void SpecialBehaviour()
+        {
+
+        }
+
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
         /// </summary>
-        private void Move()
+        protected void Move()
         {
             tokenPosition.X += mSpeedX * mFacingDirectionX;
             tokenPosition.Y += mSpeedY * mFacingDirectionY;
@@ -107,7 +114,7 @@ namespace FishORama
         /// <summary>
         /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
         /// </summary>
-        private void CheckPosition()
+        protected void CheckPosition()
         {
             Vector3 relativePosition = tokenPosition - mAquarium.Position;
 
@@ -125,7 +132,7 @@ namespace FishORama
                 if (edgeBouncingX) // If fish should bounce at this edge
                 {
                     mFacingDirectionX *= -1; // Invert horizontal moving direction
-                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX,
+                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * mRenderDirection,
                                                                   this.PossessedToken.Orientation.Y,
                                                                   this.PossessedToken.Orientation.Z);
                 }
@@ -162,20 +169,32 @@ namespace FishORama
         }
 
         /// <summary>
+        /// Used to check for the first time the update loop has run, while setting the mRand value of the fish
+        /// </summary>
+        /// <returns>Returns true the first time the method is run, false every other time</returns>
+        protected bool CheckFirstUpdate()
+        {
+            if(firstUpdate)
+            {
+                mRand = (PossessedToken as BaseFishToken).Rand;
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// AI Update method.
         /// </summary>
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            if (firstUpdate)
-            {
-                mRand = (PossessedToken as OrangeFishToken).Rand;
-
-                firstUpdate = false;
-            }
-
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
+            SpecialBehaviour();
             Move();
             CheckPosition();
 

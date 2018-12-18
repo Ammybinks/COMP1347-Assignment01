@@ -8,57 +8,18 @@ using XNAMachinationisRatio.AI;             // Required to use the XNA Machinati
 
 namespace FishORama
 {
-    class PiranhaMind : AIPlayer
+    class PiranhaMind : BaseFishMind
     {
         #region Data Members
-
-        // This mind needs to interact with the token which it possesses, 
-        // since it needs to know where are the aquarium's boundaries.
-        // Hence, the mind needs a "link" to the aquarium, which is why it stores in
-        // an instance variable a reference to its aquarium.
-        private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
-
-        private Vector3 mSize; // Size of the possessed tokens' visible dimensions, for collisions
-
-        private Vector3 tokenPosition; // Stores the temporary position of the fish
-
-        private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
-        private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
-
-        private float mSpeedX = 5; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 0; // Defines vertical movement speed of the fish
-
-        private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
-        private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
-
-        private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
-        private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
-
+        
         private bool feeding = false;
-
-        private Random mRand; // Store refence to global random number generator
-
+        
         private Vector3 chickenLegPosition;
-
-        private bool firstUpdate = true;
-
+        
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Set Aquarium in which the mind's behavior should be enacted.
-        /// </summary>
-        public AquariumToken Aquarium
-        {
-            set { mAquarium = value; }
-        }
-
-        public Vector3 Size
-        {
-            set { mSize = value; }
-        }
-
+        
         #endregion
 
         #region Constructors
@@ -68,16 +29,9 @@ namespace FishORama
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
         public PiranhaMind(X2DToken pToken)
+            :base(pToken)
         {
-            /* LEARNING PILL: associating a mind with a token
-             * In order for a mind to control a token, it must be associated with the token.
-             * This is done when the mind is constructed, using the method Possess inherited
-             * from class AIPlayer.
-             */
-            this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing.   
-
-            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen        
+            mSpeedX = 5;
 
             Console.SetCursorPosition(0, 9);
             Console.Write("Regular        ");
@@ -231,8 +185,6 @@ namespace FishORama
         {
             if (firstUpdate)
             {
-                mRand = (PossessedToken as PiranhaToken).Rand;
-
                 firstUpdate = false;
             }
 

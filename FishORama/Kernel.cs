@@ -99,10 +99,13 @@ namespace FishORama
         I2DCamera mCamera = null;   // Reference to the FishORama camera, set to null before its initialization.
                                     // Creation and initialization is performed in the LoadContent method.
 
-
+        int fishNum = 5;
         int seahorseNum = 3; // Number of seahorses placed in the aquarium
+        int bubbleNum = 5;
 
+        BaseFishToken[] fish; // Array of all fish in the aquarium
         SeahorseToken[] seahorses; // Array of all seahorses in the aquarium
+        BubbleToken[] bubbles; // Array of all bubbles in the aquarium
 
         private Random rand = new Random(); // Initialise global random number generator
 
@@ -138,7 +141,9 @@ namespace FishORama
         {
             this.IsMouseVisible = true;     // Display mouse cursor.
 
+            fish = new BaseFishToken[fishNum];
             seahorses = new SeahorseToken[seahorseNum];
+            bubbles = new BubbleToken[bubbleNum];
         }
         
         #endregion
@@ -239,6 +244,16 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
+            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            A = new X2DAsset("BubbleVisuals", "Bubble").
+                UVOriginAt(16, 16).
+                UVTopLeftCornerAt(0, 0).
+                Width(32).
+                Height(32);
+
+            // Import orange fish visual asset in the library
+            lib.ImportAsset(A);
+
             // Return library.
             return lib;
         }
@@ -279,23 +294,41 @@ namespace FishORama
             tokenPos = new Vector3(0, 0, 0);            // Define scene position for the aquarium.
             mScene.Place(aquarium, tokenPos);           // Place token in scene.
 
-            OrangeFishToken supaOrangeFish = new OrangeFishToken("SupaOrangeFish", aquarium, rand); // Create SupaOrangeFish token
-            tokenPos = new Vector3(0, 0, 1); // Define position for SupaOrangeFish
-            mScene.Place(supaOrangeFish, tokenPos); // Place token in scene
-
             for (int i = 0; i < seahorseNum; i++)
             {
-                SeahorseToken seahorse = new SeahorseToken("Seahorse 1", aquarium, rand, i);
+                SeahorseToken seahorse = new SeahorseToken("Seahorse", aquarium, rand, i);
                 
                 tokenPos = new Vector3(rand.Next(-400 + (int)seahorse.Size.X, 401 - (int)seahorse.Size.X), rand.Next(-300 + (int)seahorse.Size.Y, 301 - (int)seahorse.Size.Y), 1); // Randomise position for Seahorse
                 mScene.Place(seahorse, tokenPos); // Place token in scene
 
+                fish[i] = seahorse;
                 seahorses[i] = seahorse;
             }
 
-            PiranhaToken piranha = new PiranhaToken("SupaOrangeFish", aquarium, rand); // Create SupaOrangeFish token
+            OrangeFishToken supaOrangeFish = new OrangeFishToken("SupaOrangeFish", aquarium, rand); // Create SupaOrangeFish token
+            tokenPos = new Vector3(0, 0, 1); // Define position for SupaOrangeFish
+            mScene.Place(supaOrangeFish, tokenPos); // Place token in scene
+
+            fish[3] = supaOrangeFish;
+
+            PiranhaToken piranha = new PiranhaToken("Piranha", aquarium, rand); // Create SupaOrangeFish token
             tokenPos = new Vector3(rand.Next(-400 + (int)piranha.Size.X, 401 - (int)piranha.Size.X), rand.Next(-300 + (int)piranha.Size.Y, 301 - (int)piranha.Size.Y), 1); // Randomise position for Piranha
             mScene.Place(piranha, tokenPos); // Place token in scene
+
+            fish[4] = piranha;
+
+            for (int i = 0; i < bubbleNum; i++)
+            {
+                BubbleToken bubble = new BubbleToken("Bubble", aquarium, rand);
+
+                tokenPos = new Vector3(rand.Next(-400 + (int)bubble.Size.X, 401 - (int)bubble.Size.X), rand.Next(-300 + (int)bubble.Size.Y, 301 - (int)bubble.Size.Y), 1); // Randomise position for Seahorse
+                mScene.Place(bubble, tokenPos); // Place token in scene
+
+                bubble.AttatchedFish = fish[i];
+                bubble.Position = fish[i].Position;
+
+                bubbles[i] = bubble;
+            }
 
 
             /*

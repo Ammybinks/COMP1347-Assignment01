@@ -8,60 +8,21 @@ using XNAMachinationisRatio.AI;             // Required to use the XNA Machinati
 
 namespace FishORama
 {
-    class SeahorseMind :AIPlayer
+    class SeahorseMind : BaseFishMind
     {
         #region Data Members
-
-        // This mind needs to interact with the token which it possesses, 
-        // since it needs to know where are the aquarium's boundaries.
-        // Hence, the mind needs a "link" to the aquarium, which is why it stores in
-        // an instance variable a reference to its aquarium.
-        private AquariumToken mAquarium;        // Reference to the aquarium in which the creature lives.
-
-        private Vector3 mSize; // Size of the possessed tokens' visible dimensions, for collisions
-
-        private Vector3 tokenPosition; // Stores the temporary position of the fish
-
-        private float mFacingDirectionX;         // Horizontal direction the fish is facing (1: right; -1: left).
-        private float mFacingDirectionY;         // Vertical direction the fish is facing (1: up; -1: down).
-
-        private float mSpeedX = 2; // Defines horizontal movement speed of the fish
-        private float mSpeedY = 2; // Defines vertical movement speed of the fish
-
-        private bool edgeBouncingX; // Determines whether the fish will bounce off the edge of the left & right hand sides of the screen
-        private bool edgeBouncingY; // Determines whether the fish will bounce off the edge of the top & bottom sides of the screen
-
-        private bool hitEdgeX; // Set to true if the fish is currently hitting the left or right bounds of the screen
-        private bool hitEdgeY; // Set to true if the fish is currently hitting the top or bottom bounds of the screen
-
+        
         private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
         private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
         private float defaultDistanceToSwim;
-
-        private Random mRand; // Store refence to global random number generator
-
+        
         private bool scared = false;
         private bool chickenLegActive;
-
-        private bool firstUpdate = true;
-
+        
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Set Aquarium in which the mind's behavior should be enacted.
-        /// </summary>
-        public AquariumToken Aquarium
-        {
-            set { mAquarium = value; }
-        }
-
-        public Vector3 Size
-        {
-            set { mSize = value; }
-        }
-
+        
         public int Speed
         {
             set
@@ -70,6 +31,7 @@ namespace FishORama
                 mSpeedY = value;
             }
         }
+
         #endregion
 
         #region Constructors
@@ -79,17 +41,15 @@ namespace FishORama
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
         public SeahorseMind(X2DToken pToken)
+            :base(pToken)
         {
             /* LEARNING PILL: associating a mind with a token
              * In order for a mind to control a token, it must be associated with the token.
              * This is done when the mind is constructed, using the method Possess inherited
              * from class AIPlayer.
              */
-            this.Possess(pToken);       // Possess token.
-            mFacingDirectionX = 1;       // Current direction the fish is facing. 
             mFacingDirectionY = -1;  
-
-            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen
+            
             edgeBouncingY = true;
             
             defaultDistanceToSwim = 200;
@@ -220,92 +180,13 @@ namespace FishORama
             Console.SetCursorPosition(0, 6 + (PossessedToken as SeahorseToken).Index);
             Console.Write("Regular         ");
         }
-
-        /// <summary>
-        /// Adds the speed of the fish in both movement axes to the fishes current position
-        /// </summary>
-        private void Move()
-        {
-            tokenPosition.X += mSpeedX * mFacingDirectionX;
-            tokenPosition.Y += mSpeedY * mFacingDirectionY;
-        }
-
-        /// <summary>
-        /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
-        /// </summary>
-        private void CheckPosition()
-        {
-            Vector3 relativePosition = tokenPosition - mAquarium.Position;
-
-            if (Math.Abs(relativePosition.X) + mSize.X >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
-            {
-                if (relativePosition.X <= 0) // If the left edge of the screen was hit
-                {
-                    tokenPosition.X = ((mAquarium.Width / 2) - mSize.X) * -1; // Lock fish to left edge of screen
-                }
-                else if (relativePosition.X > 0) // If the right edge of the screen was hit
-                {
-                    tokenPosition.X = (mAquarium.Width / 2) - mSize.X; // Lock fish to right edge of screen
-                }
-
-                if (edgeBouncingX) // If fish should bounce at this edge
-                {
-                    mFacingDirectionX *= -1; // Invert horizontal moving direction
-                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
-                                                                  this.PossessedToken.Orientation.Y,
-                                                                  this.PossessedToken.Orientation.Z);
-                }
-
-                hitEdgeX = true;
-            }
-            else
-            {
-                hitEdgeX = false;
-            }
-
-            if (Math.Abs(relativePosition.Y) + mSize.Y >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
-            {
-                if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
-                {
-                    tokenPosition.Y = ((mAquarium.Height / 2) - mSize.Y) * -1; // Lock fish to bottom edge of screen
-
-                    mFacingDirectionY = 1; // Invert vertical moving direction
-                }
-                else if (relativePosition.Y > 0) // If the top edge of the screen was hit
-                {
-                    tokenPosition.Y = (mAquarium.Height / 2) - mSize.Y; // Lock fish to top of screen
-
-                    mFacingDirectionY = -1; // Invert vertical moving direction
-                }
-
-                if (edgeBouncingY) // If fish should bounce at this edge
-                {
-                }
-                
-                hitEdgeY = true;
-            }
-            else
-            {
-                hitEdgeY = false;
-            }
-        }
-
+        
         /// <summary>
         /// AI Update method.
         /// </summary>
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            //if (firstUpdate)
-            //{
-            //    mRand = (PossessedToken as SeahorseToken).Rand;
-
-            //    mSpeedX = mRand.Next(1, 6);
-            //    mSpeedY = mSpeedX;
-
-            //    firstUpdate = false;
-            //}
-
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
             if (!scared)

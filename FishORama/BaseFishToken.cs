@@ -14,14 +14,12 @@ namespace FishORama
         // This token needs to interact with the aquarium to swim in it (it needs information
         // regarding the aquarium's boundaries). Hence, it needs a "link" to the aquarium,
         // which is why it stores in an instance variable a reference to its aquarium.
-        private AquariumToken mAquarium;    // Reference to the aquarium in which the creature lives.
+        protected AquariumToken mAquarium;    // Reference to the aquarium in which the creature lives.
 
-        private BaseFishMind mMind;       // Explicit reference to the mind the token is using to enact its behaviors.
+        protected BaseFishMind mMind;       // Explicit reference to the mind the token is using to enact its behaviors.
 
-        private Vector3 mSize; // Size of the fishes visible dimensions, for collisions
-
-        private Random mRand; // Store refence to global random number generator
-
+        protected Vector3 mSize; // Size of the fishes visible dimensions, for collisions
+        
         #endregion
 
         #region Properties
@@ -54,11 +52,10 @@ namespace FishORama
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
         public BaseFishToken(String pTokenName, AquariumToken pAquarium, Random rand)
-            : base(pTokenName) {
+            : base(pTokenName, rand)
+        {
             mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
             mMind.Aquarium = mAquarium;     // Provide to the mind a reference to the aquarium, required to swim appropriately.
-
-            mRand = rand; // Store reference to random number generator, to be sent to the mind
         }
 
         #endregion

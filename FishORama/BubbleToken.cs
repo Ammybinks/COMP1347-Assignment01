@@ -5,22 +5,27 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using XNAMachinationisRatio;        // Required to use the XNA Machinationis Ratio Engine.
 
+
 namespace FishORama
 {
-    class SeahorseToken : BaseFishToken
+    class BubbleToken : BaseFishToken
     {
-        #region Data members
-        
-        private int mIndex;
+        #region Data Members
+
+        private BaseFishToken attatchedFish;
 
         #endregion
 
         #region Properties
 
-        public int Index
+        public BaseFishToken AttatchedFish
         {
-            get { return mIndex; }
-            set { mIndex = value; }
+            set { attatchedFish = value; }
+        }
+
+        public Vector3 AttatchedFishPosition
+        {
+            get { return attatchedFish.Position; }
         }
 
         #endregion
@@ -32,26 +37,14 @@ namespace FishORama
         /// initialize custom members.
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
-        public SeahorseToken(String pTokenName, AquariumToken pAquarium, Random rand, int index)
+        public BubbleToken(String pTokenName, AquariumToken pAquarium, Random rand)
             : base(pTokenName, pAquarium, rand) {
-            mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
-            mMind.Aquarium = mAquarium;     // Provide to the mind a reference to the aquarium, required to swim appropriately.
             
-            Orientation = new Vector3(-1, Orientation.Y, Orientation.Z); // Change default facing direction of the fish
-            
-            mIndex = index;
         }
 
         #endregion
 
-        #region Methods 
-
-        /* LEARNING PILL: XNA Machinationis Ration token properties.
-         * All tokens created through the XNA Machinationis Ratio engine have standard
-         * attributes that define their behavior in a simulation. These standard
-         * attributes can be initialized in a very efficient and simple way using
-         * the DeafultProperties() method.
-         */
+        #region Methods
 
         /// <summary>
         /// Setup default properties of the token.
@@ -62,7 +55,7 @@ namespace FishORama
             // Specify which image should be associated to this token, assigning
             // the name of the graphic asset to be used ("SeahorseVisuals" in this case)
             // to the property 'GraphicProperties.AssetID' of the token.
-            this.GraphicProperties.AssetID = "SeahorseVisuals";
+            this.GraphicProperties.AssetID = "BubbleVisuals";
 
             // Specify mass of the fish. This can be used by
             // physics-based behaviors (work in progress, not functional yet).
@@ -84,18 +77,16 @@ namespace FishORama
              * behavior. The behavior is implemented through the class SimpleSwimMind.
              */
 
-            SeahorseMind myMind = new SeahorseMind(this);   // Create mind, implicitly associating it to the token.
+            BubbleMind myMind = new BubbleMind(this);   // Create mind, implicitly associating it to the token.
 
 
             mMind = myMind;     // Store explicit reference to mind being used.
             mMind.Aquarium = mAquarium;   // Provide to mind explicit reference to Aquarium.
-            (mMind as SeahorseMind).Speed = mRand.Next(1, 6);
 
-            mSize = new Vector3(37, 64, 0);
+            mSize = new Vector3(16, 16, 0);
             mMind.Size = mSize; // Provide to mind the dimensions of the token
         }
 
         #endregion
-
     }
 }

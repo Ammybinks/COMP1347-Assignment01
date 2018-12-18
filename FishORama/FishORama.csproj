@@ -45,6 +45,8 @@
     <Compile Include="AquariumToken.cs" />
     <Compile Include="BaseFishMind.cs" />
     <Compile Include="BaseFishToken.cs" />
+    <Compile Include="BubbleMind.cs" />
+    <Compile Include="BubbleToken.cs" />
     <Compile Include="ChickenLegToken.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="OrangeFishMind.cs" />
