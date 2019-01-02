@@ -159,7 +159,7 @@ namespace FishORama
                         // the others. In our case, we want to insert chicken leg in front of the
                         // aquarium background. Hence, we set the Z component of the chicken leg
                         // insertion position to 1 before actually inserting the leg in the scene.
-                        legPos.Z = 3;
+                        legPos.Z = 0.5f;
 
                         this.mAquarium.Kernel.Scene.Place(mAquarium.ChickenLeg, legPos);
                     }

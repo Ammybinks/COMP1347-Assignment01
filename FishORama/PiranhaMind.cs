@@ -12,14 +12,31 @@ namespace FishORama
     {
         #region Data Members
         
-        private bool feeding = false;
-        
+        private enum state
+        {
+            patrolling,
+            feeding,
+            returning,
+            full
+        }
+        private state currentState = state.patrolling;
+
+        private float baseSpeed = 5;
+        private float fullSpeed = 1;
+
+        private Vector2 direction;
+
+        private float startingDirection;
+
+        private Vector3 startingPosition;
         private Vector3 chickenLegPosition;
-        
+
+        private int fullTimer;
+
         #endregion
 
         #region Properties
-        
+
         #endregion
 
         #region Constructors
@@ -28,12 +45,12 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
-        public PiranhaMind(X2DToken pToken)
-            :base(pToken)
+        public PiranhaMind(X2DToken pToken, Random rand)
+            : base(pToken, rand)
         {
-            mSpeedX = 5;
+            mSpeedX = baseSpeed;
 
-            Console.SetCursorPosition(0, 9);
+            Console.SetCursorPosition(0, 5);
             Console.Write("Regular        ");
         }
 
@@ -58,123 +75,137 @@ namespace FishORama
 
         private void SpecialBehaviour()
         {
-            if (mAquarium.ChickenLeg != null)
+            if ((mAquarium.ChickenLeg != null && currentState != state.full) || (currentState == state.feeding))
             {
-                if(!feeding)
+                FeedingBehaviour();
+            }
+
+            if(currentState == state.returning)
+            {
+                ReturningBehaviour();
+            }
+
+            if(currentState == state.full)
+            {
+                FullBehaviour();
+            }
+        }
+
+        private void FeedingBehaviour()
+        {
+            if (currentState != state.feeding)
+            {
+                if (currentState == state.patrolling)
                 {
-                    feeding = true;
+                    startingDirection = mFacingDirectionX;
 
-                    (PossessedToken as PiranhaToken).SwitchSprite();
-
-                    Console.SetCursorPosition(0, 9);
-                    Console.Write("Hungry        ");
+                    startingPosition = tokenPosition;
                 }
 
                 chickenLegPosition = mAquarium.ChickenLeg.Position;
 
-                Vector2 tempPosition1 = new Vector2(chickenLegPosition.X - tokenPosition.X, chickenLegPosition.Y - tokenPosition.Y);
-                Vector2 tempPosition2 = tempPosition1;
-                tempPosition1 = Vector2.Normalize(tempPosition1);
-                tempPosition1 *= mSpeedX;
+                direction = new Vector2(chickenLegPosition.X - tokenPosition.X, chickenLegPosition.Y - tokenPosition.Y);
 
-                if(Math.Abs(tempPosition1.X) > Math.Abs(tempPosition2.X) && Math.Abs(tempPosition1.Y) > Math.Abs(tempPosition2.Y))
+                if (direction.X > 0)
                 {
-                    mAquarium.RemoveChickenLeg();
-
-                    feeding = false;
-
-                    Console.SetCursorPosition(0, 9);
-                    Console.Write("Regular        ");
+                    mFacingDirectionX = 1; // Invert horizontal moving direction
+                    this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
+                                                                    this.PossessedToken.Orientation.Y,
+                                                                    this.PossessedToken.Orientation.Z);
                 }
-                else
+                else if (direction.X < 0)
                 {
-                    if (tempPosition1.X > 0)
-                    {
-                        mFacingDirectionX = 1; // Invert horizontal moving direction
-                        this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
-                                                                      this.PossessedToken.Orientation.Y,
-                                                                      this.PossessedToken.Orientation.Z);
-                    }
-                    else
-                    {
-                        mFacingDirectionX = -1; // Invert horizontal moving direction
-                        this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
-                                                                      this.PossessedToken.Orientation.Y,
-                                                                      this.PossessedToken.Orientation.Z);
-                    }
-
-                    tokenPosition += new Vector3(tempPosition1.X, tempPosition1.Y, 0);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the speed of the fish in both movement axes to the fishes current position
-        /// </summary>
-        private void Move()
-        {
-            if(!feeding)
-            {
-                tokenPosition.X += mSpeedX * mFacingDirectionX;
-                tokenPosition.Y += mSpeedY * mFacingDirectionY;
-            }
-        }
-
-        /// <summary>
-        /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
-        /// </summary>
-        private void CheckPosition()
-        {
-            Vector3 relativePosition = tokenPosition - mAquarium.Position;
-
-            if (Math.Abs(relativePosition.X) + mSize.X >= (mAquarium.Width / 2)) // If token has passed either horizontal boundary of the aquarium
-            {
-                if (relativePosition.X <= 0) // If the left edge of the screen was hit
-                {
-                    tokenPosition.X = ((mAquarium.Width / 2) - mSize.X) * -1; // Lock fish to left edge of screen
-                }
-                else if (relativePosition.X > 0) // If the right edge of the screen was hit
-                {
-                    tokenPosition.X = (mAquarium.Width / 2) - mSize.X; // Lock fish to right edge of screen
-                }
-
-                if (edgeBouncingX) // If fish should bounce at this edge
-                {
-                    mFacingDirectionX *= -1; // Invert horizontal moving direction
+                    mFacingDirectionX = -1; // Invert horizontal moving direction
                     this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
                                                                   this.PossessedToken.Orientation.Y,
                                                                   this.PossessedToken.Orientation.Z);
                 }
 
-                hitEdgeX = true;
+                currentState = state.feeding;
+
+                Console.SetCursorPosition(0, 5);
+                Console.Write("Hungry        ");
+            }
+
+
+            direction = new Vector2(chickenLegPosition.X - tokenPosition.X, chickenLegPosition.Y - tokenPosition.Y);
+            direction = Vector2.Normalize(direction);
+            direction *= mSpeedX;
+
+            Vector3 relativePosition = chickenLegPosition - tokenPosition;
+
+            if ((Math.Abs(relativePosition.X) <= mSize.X / 2) && (Math.Abs(relativePosition.Y) <= mSize.Y / 2)) // If token has passed either horizontal boundary of the aquarium
+            {
+                mAquarium.RemoveChickenLeg();
+
+                currentState = state.returning;
+
+                mFacingDirectionX *= -1; // Invert horizontal moving direction
+                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
+                                                                this.PossessedToken.Orientation.Y,
+                                                                this.PossessedToken.Orientation.Z);
+
+                Console.SetCursorPosition(0, 5);
+                Console.Write("Returning        ");
             }
             else
             {
-                hitEdgeX = false;
+                tokenPosition += new Vector3(direction.X, direction.Y, 0);
             }
+        }
 
-            if (Math.Abs(relativePosition.Y) + mSize.Y >= (mAquarium.Height / 2)) // If token has passed either vertical boundary of the aquarium
+        private void ReturningBehaviour()
+        {
+            Vector2 direction = new Vector2(startingPosition.X - tokenPosition.X, startingPosition.Y - tokenPosition.Y);
+            Vector2 direction2 = direction;
+            direction = Vector2.Normalize(direction);
+            direction *= mSpeedX;
+
+            Vector3 relativePosition = startingPosition - tokenPosition;
+
+            if ((Math.Abs(direction2.X) < mSpeedX) && (Math.Abs(direction2.Y) < mSpeedX)) // If token has passed either horizontal boundary of the aquarium
             {
-                if (relativePosition.Y <= 0) // If the bottom edge of the screen was hit
-                {
-                    tokenPosition.Y = ((mAquarium.Height / 2) - mSize.Y) * -1; // Lock fish to bottom edge of screen
-                }
-                else if (relativePosition.Y > 0) // If the top edge of the screen was hit
-                {
-                    tokenPosition.Y = (mAquarium.Height / 2) - mSize.Y; // Lock fish to top of screen
-                }
+                currentState = state.full;
 
-                if (edgeBouncingY) // If fish should bounce at this edge
-                {
-                    mFacingDirectionY *= -1; // Invert vertical moving direction
-                }
+                mSpeedX = fullSpeed;
 
-                hitEdgeY = true;
+                fullTimer = GetCurrentTime() + 5;
+
+                mFacingDirectionX = startingDirection; // Invert horizontal moving direction
+                this.PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
+                                                                this.PossessedToken.Orientation.Y,
+                                                                this.PossessedToken.Orientation.Z);
+
+                Console.SetCursorPosition(0, 5);
+                Console.Write("Full        ");
             }
             else
             {
-                hitEdgeY = false;
+                tokenPosition += new Vector3(direction.X, direction.Y, 0);
             }
+        }
+
+        private void FullBehaviour()
+        {
+            if (GetCurrentTime() > fullTimer)
+            {
+                mSpeedX = baseSpeed;
+
+                currentState = state.patrolling;
+
+                Console.SetCursorPosition(0, 5);
+                Console.Write("Patrolling        ");
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 5);
+                Console.Write($"Full {fullTimer - GetCurrentTime()}        ");
+            }
+        }
+
+        private void PatrollingBehaviour()
+        {
+
         }
 
         /// <summary>
@@ -191,8 +222,11 @@ namespace FishORama
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
             SpecialBehaviour();
-            Move();
-            CheckPosition();
+            if((currentState == state.patrolling) || (currentState == state.full))
+            {
+                Move();
+                CheckPosition();
+            }
 
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
 

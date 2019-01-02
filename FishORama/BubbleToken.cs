@@ -77,7 +77,7 @@ namespace FishORama
              * behavior. The behavior is implemented through the class SimpleSwimMind.
              */
 
-            BubbleMind myMind = new BubbleMind(this);   // Create mind, implicitly associating it to the token.
+            BubbleMind myMind = new BubbleMind(this, mRand);   // Create mind, implicitly associating it to the token.
 
 
             mMind = myMind;     // Store explicit reference to mind being used.

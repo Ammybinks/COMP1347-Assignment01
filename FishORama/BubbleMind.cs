@@ -16,6 +16,10 @@ namespace FishORama
         private float distanceFloated;
         private float distanceToFloat;
 
+        private float currentSin;
+        private float sinIncrement;
+        private float sinIntensity;
+
         #endregion
 
         #region Properties
@@ -28,15 +32,20 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
-        public BubbleMind(X2DToken pToken)
-            : base(pToken)
+        public BubbleMind(X2DToken pToken, Random rand)
+            : base(pToken, rand)
         {
             mFacingDirectionY = 1;
-            mSpeedY = 3;
+            mSpeedY = mRand.Next(3, 6);
             mSpeedX = 0;
 
             distanceFloated = 0;
             distanceToFloat = 150;
+            
+            currentSin = 0;
+            sinIncrement = 0.15f;
+            sinIntensity = mSpeedY;
+
         }
 
         #endregion
@@ -53,17 +62,16 @@ namespace FishORama
 
                 mSpeedY = mRand.Next(3, 6);
 
+                sinIntensity = mSpeedY;
+
                 distanceFloated = 0;
+                currentSin = 0;
             }
-
             
+            tokenPosition.X += ((float)Math.Sin(currentSin) * sinIntensity);
+
+            currentSin += sinIncrement;
         }
-
-        new private void CheckPosition()
-        {
-
-        }
-
 
         /// <summary>
         /// AI Update method.
@@ -71,16 +79,12 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            CheckFirstUpdate();
-
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
 
             Move();
 
             SpecialBehaviour();
-
-            CheckPosition();
-
+            
             PossessedToken.Position = tokenPosition; // Set the token's current position to the new one, after all movements
 
             /* LEARNING PILL: This is a special method which gets called over and over again from somewhere within the FishORama framework based on Game time (A timer)

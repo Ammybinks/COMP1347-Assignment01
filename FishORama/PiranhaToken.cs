@@ -42,21 +42,7 @@ namespace FishORama
          * attributes can be initialized in a very efficient and simple way using
          * the DeafultProperties() method.
          */
-
-        public void SwitchSprite()
-        {
-            if (this.GraphicProperties.AssetID == "PiranhaVisuals1")
-            {
-                this.GraphicProperties.AssetID = "PiranhaVisuals2";
-            }
-            else
-            {
-                this.GraphicProperties.AssetID = "PiranhaVisuals1";
-            }
-
-            
-        }
-
+         
         /// <summary>
         /// Setup default properties of the token.
         /// </summary>
@@ -88,7 +74,7 @@ namespace FishORama
              * behavior. The behavior is implemented through the class SimpleSwimMind.
              */
 
-            PiranhaMind myMind = new PiranhaMind(this);   // Create mind, implicitly associating it to the token.
+            PiranhaMind myMind = new PiranhaMind(this, mRand);   // Create mind, implicitly associating it to the token.
 
 
             mMind = myMind;     // Store explicit reference to mind being used.

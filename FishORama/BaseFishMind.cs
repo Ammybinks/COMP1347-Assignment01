@@ -57,6 +57,11 @@ namespace FishORama
             set { mSize = value; }
         }
         
+        public Random Rand
+        {
+            set { mRand = value; }
+        }
+
         #endregion
 
         #region Constructors
@@ -65,7 +70,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
-        public BaseFishMind(X2DToken pToken)
+        public BaseFishMind(X2DToken pToken, Random rand)
         {
             /* LEARNING PILL: associating a mind with a token
              * In order for a mind to control a token, it must be associated with the token.
@@ -73,6 +78,9 @@ namespace FishORama
              * from class AIPlayer.
              */
             this.Possess(pToken);       // Possess token.
+
+            mRand = rand;
+
             mFacingDirectionX = 1;       // Current direction the fish is facing.   
 
             edgeBouncingX = true; // Set the fish to bounce off the edges of the screen         
@@ -168,22 +176,10 @@ namespace FishORama
             }
         }
 
-        /// <summary>
-        /// Used to check for the first time the update loop has run, while setting the mRand value of the fish
-        /// </summary>
-        /// <returns>Returns true the first time the method is run, false every other time</returns>
-        protected bool CheckFirstUpdate()
+        /// <returns>The current system time in seconds</returns>
+        protected int GetCurrentTime()
         {
-            if(firstUpdate)
-            {
-                mRand = (PossessedToken as BaseFishToken).Rand;
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return DateTime.Now.Second + DateTime.Now.Minute * 60;
         }
 
         /// <summary>

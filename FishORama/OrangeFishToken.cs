@@ -151,7 +151,7 @@ namespace FishORama
              * behavior. The behavior is implemented through the class SimpleSwimMind.
              */
 
-            OrangeFishMind myMind = new OrangeFishMind(this);   // Create mind, implicitly associating it to the token.
+            OrangeFishMind myMind = new OrangeFishMind(this, mRand);   // Create mind, implicitly associating it to the token.
             
 
             mMind = myMind;     // Store explicit reference to mind being used.

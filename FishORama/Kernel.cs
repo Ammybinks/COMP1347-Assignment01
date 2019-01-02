@@ -101,11 +101,9 @@ namespace FishORama
 
         int fishNum = 5;
         int seahorseNum = 3; // Number of seahorses placed in the aquarium
-        int bubbleNum = 5;
 
         BaseFishToken[] fish; // Array of all fish in the aquarium
         SeahorseToken[] seahorses; // Array of all seahorses in the aquarium
-        BubbleToken[] bubbles; // Array of all bubbles in the aquarium
 
         private Random rand = new Random(); // Initialise global random number generator
 
@@ -143,7 +141,6 @@ namespace FishORama
 
             fish = new BaseFishToken[fishNum];
             seahorses = new SeahorseToken[seahorseNum];
-            bubbles = new BubbleToken[bubbleNum];
         }
         
         #endregion
@@ -311,23 +308,21 @@ namespace FishORama
 
             fish[3] = supaOrangeFish;
 
-            PiranhaToken piranha = new PiranhaToken("Piranha", aquarium, rand); // Create SupaOrangeFish token
+            PiranhaToken piranha = new PiranhaToken("Piranha", aquarium, rand); // Create Piranha token
             tokenPos = new Vector3(rand.Next(-400 + (int)piranha.Size.X, 401 - (int)piranha.Size.X), rand.Next(-300 + (int)piranha.Size.Y, 301 - (int)piranha.Size.Y), 1); // Randomise position for Piranha
             mScene.Place(piranha, tokenPos); // Place token in scene
 
             fish[4] = piranha;
 
-            for (int i = 0; i < bubbleNum; i++)
+            for (int i = 0; i < fish.Length; i++)
             {
                 BubbleToken bubble = new BubbleToken("Bubble", aquarium, rand);
 
-                tokenPos = new Vector3(rand.Next(-400 + (int)bubble.Size.X, 401 - (int)bubble.Size.X), rand.Next(-300 + (int)bubble.Size.Y, 301 - (int)bubble.Size.Y), 1); // Randomise position for Seahorse
+                tokenPos = new Vector3(0, 0, 2); // Initialise the bubble at (0,0,2), ensuring that it starts on a layer higher than any other fish
                 mScene.Place(bubble, tokenPos); // Place token in scene
 
                 bubble.AttatchedFish = fish[i];
                 bubble.Position = fish[i].Position;
-
-                bubbles[i] = bubble;
             }
 
 
