@@ -10,57 +10,61 @@ namespace FishORama
 {
     class SeahorseMind : BaseFishMind
     {
-        #region Data Members
+    #region Data Members
 
-        private Vector3 startingPosition;
+        private Vector3 startingPosition; // Tracks the position the fish started at
 
         private float distanceSwum; // Distance the fish has swum since the beginning of its special behaviour
         private float distanceToSwim; // Distance the fish should swim before ending any given behaviour
         
+        // Boolean values for keeping track of whether the fish should be fleeing or not
         private bool scared = false;
         private bool chickenLegActive;
 
+
+        /* Disabled code for implementing sine wave movement behaviour
         private float currentSin;
         private float sinIncrement;
         private float sinIntensity;
+        */
 
-        #endregion
+    #endregion
 
-        #region Properties
-        
-        #endregion
+    #region Properties
 
-        #region Constructors
+    #endregion
 
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="pToken">Token to be associated with the mind.</param>
-        public SeahorseMind(X2DToken pToken, Random rand)
-            : base(pToken, rand)
-        {
-            /* LEARNING PILL: associating a mind with a token
-             * In order for a mind to control a token, it must be associated with the token.
-             * This is done when the mind is constructed, using the method Possess inherited
-             * from class AIPlayer.
-             */
-            mFacingDirectionY = -1;  
-            
-            edgeBouncingY = true;
+    #region Constructors
 
-            mSpeedX = mRand.Next(1, 6);
-            mSpeedY = mSpeedX;
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="pToken">Token to be associated with the mind.</param>
+    /// <param name="rand">Reference to the global Random object</param>
+    public SeahorseMind(X2DToken pToken, Random rand)
+        : base(pToken, rand)
+    {
+        mFacingDirectionY = -1; // Sets the default direction the fish swims vertically
 
-            distanceToSwim = 100;
+        edgeBouncingY = true; // Set the fish to bounce off the edges of the screen
 
-            currentSin = 0;
-            sinIntensity = 100f;
-            sinIncrement = mSpeedX / 100;
-        }
+        // Randomises the fishes movement speed
+        mSpeedX = mRand.Next(1, 6); 
+        mSpeedY = mSpeedX;
 
-        #endregion
+        distanceToSwim = 100; // Sets default distance the fish should swim before turning
 
-        #region Methods
+
+        /* Disabled code for implementing sine wave movement behaviour
+        currentSin = 0;
+        sinIntensity = 100f;
+        sinIncrement = mSpeedX / 100;
+        */
+    }
+
+    #endregion
+
+    #region Methods
 
 
         /* LEARNING PILL: The AI update method.
@@ -76,71 +80,74 @@ namespace FishORama
          * a method invoked by Update, then it is IGNORED.
          * 
          */
-
+        
+        /// <summary>
+        /// Checks if the chicken leg is placed in the aquarium, while moving the fish quickly away if it is
+        /// </summary>
         private void SpecialBehaviour()
-        {
-            if (mAquarium.ChickenLeg != null) // If chicken leg is placed in the aquarium
             {
-                if(!chickenLegActive) // For the first update before chickenLegActive is set to true
+                if (mAquarium.ChickenLeg != null) // If chicken leg is placed in the aquarium
                 {
-                    scared = true;
-
-                    edgeBouncingX = false;
-                    edgeBouncingY = false;
-
-                    chickenLegActive = true;
-
-                    distanceSwum = 0; // Reset distance the fish has swum
-                }
-            }
-            else if (chickenLegActive)
-            {
-                chickenLegActive = false;
-            }
-
-            if(scared)
-            {
-                Vector3 chickenLegPosition = mAquarium.ChickenLeg.Position;
-
-                Vector2 tempPosition1 = new Vector2(tokenPosition.X - chickenLegPosition.X, tokenPosition.Y - chickenLegPosition.Y);
-                tempPosition1 = Vector2.Normalize(tempPosition1);
-                tempPosition1 *= mSpeedX + 5;
-                
-                if (distanceSwum >= distanceToSwim)
-                {
-                    SetRegularBehaviour();
-                }
-                else
-                {
-                    if (tempPosition1.X > 0)
+                    if(!chickenLegActive) // For the first update before chickenLegActive is set to true
                     {
-                        mFacingDirectionX = 1; // Invert horizontal moving direction
-                        PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
-                                                                      PossessedToken.Orientation.Y,
-                                                                      PossessedToken.Orientation.Z);
+                        scared = true;
+                        chickenLegActive = true;
+
+                        edgeBouncingX = false;
+                        edgeBouncingY = false;
+
+                        distanceSwum = 0; // Reset distance the fish has swum
+                    }
+                }
+                else if (chickenLegActive)
+                {
+                    chickenLegActive = false;
+                }
+
+                if(scared) // If currently fleeing
+                {
+                    Vector3 chickenLegPosition = mAquarium.ChickenLeg.Position;
+
+                    // Determine direction the fish should swim
+                    Vector2 tempPosition1 = new Vector2(tokenPosition.X - chickenLegPosition.X, tokenPosition.Y - chickenLegPosition.Y);
+                    tempPosition1 = Vector2.Normalize(tempPosition1);
+                    tempPosition1 *= mSpeedX + 5;
+                
+                    if (distanceSwum >= distanceToSwim)
+                    {
+                        SetRegularBehaviour();
                     }
                     else
                     {
-                        mFacingDirectionX = -1; // Invert horizontal moving direction
-                        PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
-                                                                      PossessedToken.Orientation.Y,
-                                                                      PossessedToken.Orientation.Z);
+                        if (tempPosition1.X > 0)
+                        {
+                            mFacingDirectionX = 1; // Invert horizontal moving direction
+                            PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
+                                                                          PossessedToken.Orientation.Y,
+                                                                          PossessedToken.Orientation.Z);
+                        }
+                        else
+                        {
+                            mFacingDirectionX = -1; // Invert horizontal moving direction
+                            PossessedToken.Orientation = new Vector3(mFacingDirectionX * -1,
+                                                                          PossessedToken.Orientation.Y,
+                                                                          PossessedToken.Orientation.Z);
+                        }
+
+                        tokenPosition += new Vector3(tempPosition1.X, tempPosition1.Y, 0);
+
+                        distanceSwum += mSpeedX + 5;
                     }
-
-                    tokenPosition += new Vector3(tempPosition1.X, tempPosition1.Y, 0);
-
-                    distanceSwum += mSpeedX + 5;
                 }
-            }
-            /* Disabled code for implementing sine wave movement behaviour
-            else
-            {
-                tokenPosition = new Vector3(tokenPosition.X, startingPosition.Y + ((float)Math.Sin(currentSin) * sinIntensity), startingPosition.Z);
+                /* Disabled code for implementing sine wave movement behaviour
+                else
+                {
+                    tokenPosition = new Vector3(tokenPosition.X, startingPosition.Y + ((float)Math.Sin(currentSin) * sinIntensity), startingPosition.Z);
 
-                currentSin += sinIncrement;
+                    currentSin += sinIncrement;
+                }
+                */
             }
-            */
-        }
 
         /// <summary>
         /// Returns the fish to its default movement behaviour, either when the program starts or after the fish stops running from the chicken leg
@@ -156,7 +163,7 @@ namespace FishORama
         }
 
         /// <summary>
-        /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium
+        /// Checks the current position of the fish, ensuring it doesn't leave the bounds of the aquarium. Also inverts vertical direction if the fish has swum far enough
         /// </summary>
         private new void CheckPosition()
         {

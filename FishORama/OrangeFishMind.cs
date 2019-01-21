@@ -82,6 +82,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public OrangeFishMind(X2DToken pToken, Random rand)
             : base(pToken, rand)
         {

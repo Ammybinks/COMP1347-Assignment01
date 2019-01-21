@@ -51,6 +51,7 @@ namespace FishORama
         /// initialize custom members.
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public BaseFishToken(String pTokenName, AquariumToken pAquarium, Random rand)
             : base(pTokenName, rand)
         {

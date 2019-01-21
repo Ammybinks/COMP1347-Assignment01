@@ -201,7 +201,7 @@ namespace FishORama
             // Import first marker visual asset in the library
             lib.ImportAsset(A);
 
-            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            // Create a new graphic asset for the orange fish visuals using class X2DAsset.
             A = new X2DAsset("OrangeFishVisuals", "OrangeFish").
                 UVOriginAt(64, 42).
                 UVTopLeftCornerAt(0, 0).
@@ -211,7 +211,7 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
-            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            // Create a new graphic asset for the seahorse visuals using class X2DAsset.
             A = new X2DAsset("SeahorseVisuals", "Seahorse").
                 UVOriginAt(37, 64).
                 UVTopLeftCornerAt(0, 0).
@@ -221,7 +221,7 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
-            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            // Create a new graphic asset for the regular piranha visuals using class X2DAsset.
             A = new X2DAsset("PiranhaVisuals1", "Piranha1").
                 UVOriginAt(66, 64).
                 UVTopLeftCornerAt(0, 0).
@@ -231,7 +231,7 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
-            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            // Create a new graphic asset for the angry piranha visuals using class X2DAsset.
             A = new X2DAsset("PiranhaVisuals2", "Piranha2").
                 UVOriginAt(66, 64).
                 UVTopLeftCornerAt(0, 0).
@@ -241,7 +241,7 @@ namespace FishORama
             // Import orange fish visual asset in the library
             lib.ImportAsset(A);
 
-            // Create a new graphic asset  for the orange fish visuals using class X2DAsset.
+            // Create a new graphic asset for the bubble visuals using class X2DAsset.
             A = new X2DAsset("BubbleVisuals", "Bubble").
                 UVOriginAt(16, 16).
                 UVTopLeftCornerAt(0, 0).
@@ -291,7 +291,7 @@ namespace FishORama
             tokenPos = new Vector3(0, 0, 0);            // Define scene position for the aquarium.
             mScene.Place(aquarium, tokenPos);           // Place token in scene.
 
-            for (int i = 0; i < seahorseNum; i++)
+            for (int i = 0; i < seahorseNum; i++) // Create seahorse tokens
             {
                 SeahorseToken seahorse = new SeahorseToken("Seahorse", aquarium, rand, i);
                 
@@ -314,7 +314,7 @@ namespace FishORama
 
             fish[4] = piranha;
 
-            for (int i = 0; i < fish.Length; i++)
+            for (int i = 0; i < fish.Length; i++) // Create bubble tokens
             {
                 BubbleToken bubble = new BubbleToken("Bubble", aquarium, rand);
 

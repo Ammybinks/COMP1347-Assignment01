@@ -32,6 +32,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public BubbleMind(X2DToken pToken, Random rand)
             : base(pToken, rand)
         {
@@ -52,6 +53,9 @@ namespace FishORama
 
         #region Methods
 
+        /// <summary>
+        /// Determines when the bubble should reset its position and moves it horizontally in a wave
+        /// </summary>
         private void SpecialBehaviour()
         {
             distanceFloated += mSpeedY;
@@ -68,7 +72,7 @@ namespace FishORama
                 currentSin = 0;
             }
             
-            tokenPosition.X += ((float)Math.Sin(currentSin) * sinIntensity);
+            tokenPosition.X += ((float)Math.Sin(currentSin) * sinIntensity); // Move the bubble in a sine pattern along the X axis
 
             currentSin += sinIncrement;
         }
@@ -79,7 +83,7 @@ namespace FishORama
         /// <param name="pGameTime">Game time</param>
         public override void Update(ref GameTime pGameTime)
         {
-            tokenPosition = PossessedToken.Position; // Store the current position of the fish
+            tokenPosition = PossessedToken.Position; // Store the current position of the bubble
 
             Move();
 

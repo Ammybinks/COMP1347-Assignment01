@@ -12,6 +12,7 @@ namespace FishORama
     {
         #region Data Members
         
+        // Enumeration that determines what the fish is currently doing
         private enum state
         {
             patrolling,
@@ -26,9 +27,10 @@ namespace FishORama
 
         private Vector2 direction;
 
+        // Data members that indicate the position the fish was in before it stopped patrolling
         private float startingDirection;
-
         private Vector3 startingPosition;
+
         private Vector3 chickenLegPosition;
 
         private int fullTimer;
@@ -45,6 +47,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public PiranhaMind(X2DToken pToken, Random rand)
             : base(pToken, rand)
         {
@@ -73,9 +76,12 @@ namespace FishORama
          * 
          */
 
+        /// <summary>
+        /// Determines which specific behaviour the fish should enact
+        /// </summary>
         private void SpecialBehaviour()
         {
-            if ((mAquarium.ChickenLeg != null && currentState != state.full) || (currentState == state.feeding))
+            if ((mAquarium.ChickenLeg != null && (currentState != state.full && currentState != state.returning)) || (currentState == state.feeding))
             {
                 FeedingBehaviour();
             }
@@ -91,9 +97,12 @@ namespace FishORama
             }
         }
 
+        /// <summary>
+        /// Moves the fish towards the chicken leg, removing it once reached
+        /// </summary>
         private void FeedingBehaviour()
         {
-            if (currentState != state.feeding)
+            if (currentState != state.feeding) // For the first time this method is run
             {
                 if (currentState == state.patrolling)
                 {
@@ -127,14 +136,14 @@ namespace FishORama
                 Console.Write("Hungry        ");
             }
 
-
+            // Get direction to swim
             direction = new Vector2(chickenLegPosition.X - tokenPosition.X, chickenLegPosition.Y - tokenPosition.Y);
             direction = Vector2.Normalize(direction);
             direction *= mSpeedX;
 
             Vector3 relativePosition = chickenLegPosition - tokenPosition;
 
-            if ((Math.Abs(relativePosition.X) <= mSize.X / 2) && (Math.Abs(relativePosition.Y) <= mSize.Y / 2)) // If token has passed either horizontal boundary of the aquarium
+            if ((Math.Abs(relativePosition.X) <= mSize.X / 2) && (Math.Abs(relativePosition.Y) <= mSize.Y / 2)) // If token has reached the chicken leg
             {
                 mAquarium.RemoveChickenLeg();
 
@@ -154,6 +163,9 @@ namespace FishORama
             }
         }
 
+        /// <summary>
+        /// Moves the fish towards its original patrol position
+        /// </summary>
         private void ReturningBehaviour()
         {
             Vector2 direction = new Vector2(startingPosition.X - tokenPosition.X, startingPosition.Y - tokenPosition.Y);
@@ -185,6 +197,9 @@ namespace FishORama
             }
         }
 
+        /// <summary>
+        /// Determines when the fish should increase its speed and return to normal behaviour
+        /// </summary>
         private void FullBehaviour()
         {
             if (GetCurrentTime() > fullTimer)
@@ -201,11 +216,6 @@ namespace FishORama
                 Console.SetCursorPosition(0, 5);
                 Console.Write($"Full {fullTimer - GetCurrentTime()}        ");
             }
-        }
-
-        private void PatrollingBehaviour()
-        {
-
         }
 
         /// <summary>

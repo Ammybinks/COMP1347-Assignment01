@@ -176,3 +176,38 @@ C:\Users\blya1_18\Downloads\18015051_COMP1347_Assignment01_Milestone02\FishORama
 C:\Users\blya1_18\Downloads\18015051_COMP1347_Assignment01_Milestone02\FishORama\bin\Windows\Debug\SharpDX.RawInput.xml
 C:\Users\blya1_18\Downloads\18015051_COMP1347_Assignment01_Milestone02\FishORama\bin\Windows\Debug\SharpDX.Direct3D9.xml
 C:\Users\blya1_18\Downloads\18015051_COMP1347_Assignment01_Milestone02\FishORama\obj\x86\Debug\FishORama.csprojResolveAssemblyReference.cache
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\obj\x86\Debug\FishORama.exe
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\obj\x86\Debug\FishORama.pdb
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\bubble.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\ChickenLeg.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\OrangeFish.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\Piranha1.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\Piranha2.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\seahorse.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\Urchin.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\Content\AquariumBackground.png
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\FishORama.exe
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\FishORama.pdb
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\MonoGame.Framework.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\XNAMachinationisRatio.exe
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.MediaFoundation.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.XAudio2.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct3D11.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.DXGI.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct2D1.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.XInput.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.RawInput.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct3D9.dll
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\XNAMachinationisRatio.pdb
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\MonoGame.Framework.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.MediaFoundation.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.XAudio2.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct3D11.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.DXGI.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct2D1.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.XInput.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.RawInput.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\bin\Windows\Debug\SharpDX.Direct3D9.xml
+D:\Users\Nye Blythe\Documents\GitHub\COMP1347-Assignment01\FishORama\obj\x86\Debug\FishORama.csprojResolveAssemblyReference.cache

@@ -51,7 +51,7 @@ namespace FishORama
         {
             set { mAquarium = value; }
         }
-
+        
         public Vector3 Size
         {
             set { mSize = value; }
@@ -70,6 +70,7 @@ namespace FishORama
         /// Default constructor.
         /// </summary>
         /// <param name="pToken">Token to be associated with the mind.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public BaseFishMind(X2DToken pToken, Random rand)
         {
             /* LEARNING PILL: associating a mind with a token
@@ -77,13 +78,13 @@ namespace FishORama
              * This is done when the mind is constructed, using the method Possess inherited
              * from class AIPlayer.
              */
-            this.Possess(pToken);       // Possess token.
+            this.Possess(pToken); // Possess token.
 
-            mRand = rand;
+            mRand = rand; // Store reference to the global Random object
 
-            mFacingDirectionX = 1;       // Current direction the fish is facing.   
+            mFacingDirectionX = 1; // Set default direction the fish is facing.   
 
-            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen         
+            edgeBouncingX = true; // Set the fish to bounce off the edges of the screen
         }
 
         #endregion
@@ -104,12 +105,7 @@ namespace FishORama
          * a method invoked by Update, then it is IGNORED.
          * 
          */
-
-        private void SpecialBehaviour()
-        {
-
-        }
-
+         
         /// <summary>
         /// Adds the speed of the fish in both movement axes to the fishes current position
         /// </summary>
@@ -189,8 +185,7 @@ namespace FishORama
         public override void Update(ref GameTime pGameTime)
         {
             tokenPosition = PossessedToken.Position; // Store the current position of the fish
-
-            SpecialBehaviour();
+            
             Move();
             CheckPosition();
 

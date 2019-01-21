@@ -11,7 +11,7 @@ namespace FishORama
     {
         #region Data members
         
-        private int mIndex;
+        private int mIndex; // Stores the position the seahorse takes in the array, for debugging purposes
 
         #endregion
 
@@ -32,6 +32,7 @@ namespace FishORama
         /// initialize custom members.
         /// <param name="pTokenName">Name of the token.</param>
         /// <param name="pAquarium">Reference to the aquarium in which the token lives.</param>
+        /// <param name="rand">Reference to the global Random object</param>
         public SeahorseToken(String pTokenName, AquariumToken pAquarium, Random rand, int index)
             : base(pTokenName, pAquarium, rand) {
             mAquarium = pAquarium;          // Store reference to aquarium in which the creature is living.
